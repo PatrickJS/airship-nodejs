@@ -1,0 +1,18 @@
+{
+  "name": "airship-js",
+  "version": "1.0.0",
+  "description": "SDK for Airship",
+  "main": "main.js",
+  "scripts": {
+    "build": "babel index.js > dist.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta.38",
+    "@babel/core": "^7.0.0-beta.38",
+    "@babel/preset-env": "^7.0.0-beta.38"
+  },
+  "dependencies": {
+    "superagent": "^3.8.2"
+  }
+}
