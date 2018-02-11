@@ -1,4 +1,4 @@
-import request from "superagent"
+import request from 'superagent'
 
 export default class Airship {
   constructor(options, cb) {
@@ -38,7 +38,7 @@ export default class Airship {
 
     var getGatingInfoPromise = () => {
       // TODO: get the url for this request
-      return request.get("gatingInfo-endpoint")
+      return request.get('gatingInfo-endpoint')
         .set('Api-Key', this.apiKey)
         .timeout(this.timeout)
     }
@@ -82,7 +82,7 @@ export default class Airship {
     if (cb) {
       initialGatingInfoPromise
         .then(() => cb(null, true))
-        .catch(() => cb(new Error("Airship: failed to initialize, will re-try in five (5) minutes.")))
+        .catch(() => cb(new Error('Airship: failed to initialize, will re-try in five (5) minutes.')))
       return
     }
 
@@ -103,7 +103,7 @@ export default class Airship {
       // not right now, but we could add .then() referring to `payload` to put it back in the gateStatsBatch
 
       // TODO: get the url for this request
-      return request.post("upload-stats-endpoint")
+      return request.post('upload-stats-endpoint')
         .set('Api-Key', this.apiKey)
         .timeout(this.timeout)
         .send(payload)
@@ -155,13 +155,13 @@ export default class Airship {
     }
 
     const url = controlShortName
-      ? "https://api.airshiphq.com/v1/gate"
-      : "https://api.airshiphq.com/v1/identify"
+      ? 'https://api.airshiphq.com/v1/gate'
+      : 'https://api.airshiphq.com/v1/identify'
 
     return request
       .post(url)
-      .type("application/json")
-      .set("Api-Key", this.apiKey)
+      .type('application/json')
+      .set('Api-Key', this.apiKey)
       .timeout(this.timeout)
       .send(payload)
   }
