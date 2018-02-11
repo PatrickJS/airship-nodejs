@@ -17,13 +17,14 @@ export default class Airship {
     this.maxGateStatsBatchSize = options.maxGateStatsBatchSize != null // Allow 0 for no batching
       ? Math.min(Math.max(options.maxGateStatsBatchSize, 0), hardMaxGateStatsBatchSize) : hardMaxGateStatsBatchSize;
     this.gateStatsUploadBatchInterval = options.gateStatsUploadBatchInterval != null // Allow 0 for BatchInterval -> immediate
-      ? options.gateStatsUploadBatchInterval : 60; // in seconds
+      ? Math.max(options.gateStatsUploadBatchInterval, 0) : 5000; // in milliseconds
     // This is the timer from setInterval for uploading stats. This timer is cleared and recreated
     // when the batch size is reached, ensuring that stats uplead requests are always triggered
     // within options.gateStatsUploadBatchInterval seconds of the event.
     // More than one upload stats requests can simultaneously be in flight (unlike rules)
     this.gateStatsUploadTimeout = null;
     this.gateStatsBatch = [];
+    this.triggerUploadStats = this.triggerUploadStats.bind(this);
   }
 
   // If this is passed a callback as an argument, the arguments null, true will be passed on success,
@@ -60,19 +61,19 @@ export default class Airship {
         return;
       }
 
-      this.gatingInfoPromise = getGatingInfoPromise().then(gatingInfo => {
+      this.gatingInfoPromise = getFakeGatingInfoPromise().then(gatingInfo => {
         this.gatingInfo = gatingInfo
         this.gatingInfoPromise = null // this code should be in a .finally, but that may not be widely supported
       }).catch(reason => {
         this.gatingInfoPromise = null // this code should be in a .finally, but that may not be widely supported
         this.gatingInfoErrorCb(reason)
-        throw reason
+        throw reason // TODO: important, need to catch inside the setInterval
       })
       return this.gatingInfoPromise
     }
 
     var initialGatingInfoPromise = maybeGetGatingInfoPromise();
-    setInterval(maybeGetGatingInfoPromise, 5 * 60 * 1000);
+    setInterval(maybeGetGatingInfoPromise, 3 * 1000);
 
     if (cb) {
       initialGatingInfoPromise
@@ -84,7 +85,12 @@ export default class Airship {
     return initialGatingInfoPromise;
   }
 
+  // TODO: fix babel to triggerUploadStats = () => {
   triggerUploadStats() {
+    if (!this.gateStatsBatch.length) {
+      return;
+    }
+
     var getUploadStatsPromise = () => {
       var payload = this.gateStatsBatch
       this.gateStatsBatch = []
@@ -111,16 +117,18 @@ export default class Airship {
       })
     }
 
-    return getUploadStatsPromise();
+    return getFakeUploadStatsPromise();
   }
 
   _uploadStatsAsync(gateStats) {
     this.gateStatsBatch.push(gateStats);
-    if (this.gateStatsUploadBatchInterval === 0 || this.gateStatsBatch.length >= this.maxGateStatsBatchSize) {
+    if (this.gateStatsUploadBatchInterval === 0) {
       setImmediate(this.triggerUploadStats)
+      return
     }
 
-    if (this.gateStatsUploadBatchInterval > 0) {
+    if (this.gateStatsBatch.length >= this.maxGateStatsBatchSize) {
+      setImmediate(this.triggerUploadStats)
       // recreate the setInterval Timeout
       clearInterval(this.gateStatsUploadTimeout)
       this.gateStatsUploadTimeout = setInterval(this.triggerUploadStats, this.gateStatsUploadBatchInterval);
@@ -174,8 +182,11 @@ export default class Airship {
       return false
     }
 
+    // TODO: remove test logging
+    console.log('current gatingInfo', this.gatingInfo)
+
     // TODO: implement the line below
-    const gatesStats = Date.now() // TODO: remember to serialize in case objects change
+    const gateStats = Date.now() // TODO: remember to serialize in case objects change
     this._uploadStatsAsync(gateStats)
   }
 
