@@ -73,7 +73,11 @@ export default class Airship {
     }
 
     var initialGatingInfoPromise = maybeGetGatingInfoPromise();
-    setInterval(maybeGetGatingInfoPromise, 3 * 1000);
+    setInterval(() => {
+      maybeGetGatingInfoPromise().catch(reason => {
+        // Catch the error, but ignore or notify.
+      })
+    }, 3 * 1000);
 
     if (cb) {
       initialGatingInfoPromise
@@ -98,7 +102,7 @@ export default class Airship {
       // TODO: error handling on triggerUploadStats - do we try again?
       // not right now, but we could add .then() referring to `payload` to put it back in the gateStatsBatch
 
-      // TODO: get the url for this request      
+      // TODO: get the url for this request
       return request.post("upload-stats-endpoint")
         .set('Api-Key', this.apiKey)
         .timeout(this.timeout)
