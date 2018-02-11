@@ -11,10 +11,16 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.39",
     "@babel/core": "^7.0.0-beta.39",
+    "@babel/node": "^7.0.0-beta.39",
     "@babel/preset-env": "^7.0.0-beta.39",
     "nodemon": "^1.14.12"
   },
   "dependencies": {
     "superagent": "^3.8.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/airshiphq/airship-nodejs"
+  },
+  "license" : "SEE LICENSE IN LICENSE"
 }
