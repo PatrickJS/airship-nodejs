@@ -3,7 +3,7 @@ import request from "superagent";
 export default class Airship {
   constructor(options, cb) {
     this.apiKey = options.apiKey;
-    this.environment = options.environment;
+    this.envKey = options.envKey;
     this.timeout = options.timeout || 1000;
     this.transformer = options.transformer || (x => x);
 
@@ -141,7 +141,7 @@ export default class Airship {
 
   _endpoint(objects, controlShortName) {
     const payload = {
-      env_key: this.environment
+      env_key: this.envKey
     };
 
     if (controlShortName) {
