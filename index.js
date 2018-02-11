@@ -1,30 +1,30 @@
-import request from "superagent";
+import request from "superagent"
 
 export default class Airship {
   constructor(options, cb) {
-    this.apiKey = options.apiKey;
-    this.envKey = options.envKey;
-    this.timeout = options.timeout || 1000;
-    this.transformer = options.transformer || (x => x);
+    this.apiKey = options.apiKey
+    this.envKey = options.envKey
+    this.timeout = options.timeout || 10000
+    this.transformer = options.transformer || (x => x)
 
     // This is passed a reason.
-    this.gatingInfoErrorCb = options.gatingInfoErrorCb || (() => console.error('Airship: failed to retrieve gating info.'));
-    this.gatingInfo = null;
+    this.gatingInfoErrorCb = options.gatingInfoErrorCb || (() => console.error('Airship: failed to retrieve gating info.'))
+    this.gatingInfo = null
     // Used to check whether we are already trying to get gatingInfo.
-    this.gatingInfoPromise = null;
+    this.gatingInfoPromise = null
 
-    var hardMaxGateStatsBatchSize = 500;
+    var hardMaxGateStatsBatchSize = 500
     this.maxGateStatsBatchSize = options.maxGateStatsBatchSize != null // Allow 0 for no batching
-      ? Math.min(Math.max(options.maxGateStatsBatchSize, 0), hardMaxGateStatsBatchSize) : hardMaxGateStatsBatchSize;
+      ? Math.min(Math.max(options.maxGateStatsBatchSize, 0), hardMaxGateStatsBatchSize) : hardMaxGateStatsBatchSize
     this.gateStatsUploadBatchInterval = options.gateStatsUploadBatchInterval != null // Allow 0 for BatchInterval -> immediate
-      ? Math.max(options.gateStatsUploadBatchInterval, 0) : 5000; // in milliseconds
+      ? Math.max(options.gateStatsUploadBatchInterval, 0) : 5000 // in milliseconds
     // This is the timer from setInterval for uploading stats. This timer is cleared and recreated
     // when the batch size is reached, ensuring that stats uplead requests are always triggered
     // within options.gateStatsUploadBatchInterval seconds of the event.
     // More than one upload stats requests can simultaneously be in flight (unlike rules)
-    this.gateStatsUploadTimeout = null;
-    this.gateStatsBatch = [];
-    this.triggerUploadStats = this.triggerUploadStats.bind(this);
+    this.gateStatsUploadTimeout = null
+    this.gateStatsBatch = []
+    this.triggerUploadStats = this.triggerUploadStats.bind(this)
   }
 
   // If this is passed a callback as an argument, the arguments null, true will be passed on success,
@@ -33,7 +33,7 @@ export default class Airship {
   // initialization is complete.
   init(cb) {
     if (this.gateStatsUploadBatchInterval > 0) {
-      this.gateStatsUploadTimeout = setInterval(this.triggerUploadStats, this.gateStatsUploadBatchInterval);
+      this.gateStatsUploadTimeout = setInterval(this.triggerUploadStats, this.gateStatsUploadBatchInterval)
     }
 
     var getGatingInfoPromise = () => {
@@ -51,14 +51,14 @@ export default class Airship {
             timestamp: Date.now()
           }
           console.log('Airship: retrieved gatingInfo', gatingInfo)
-          resolve(gatingInfo);
+          resolve(gatingInfo)
         }, 500)
       })
     }
 
     var maybeGetGatingInfoPromise = () => {
       if (this.gatingInfoPromise) {
-        return;
+        return
       }
 
       this.gatingInfoPromise = getFakeGatingInfoPromise().then(gatingInfo => {
@@ -72,27 +72,27 @@ export default class Airship {
       return this.gatingInfoPromise
     }
 
-    var initialGatingInfoPromise = maybeGetGatingInfoPromise();
+    var initialGatingInfoPromise = maybeGetGatingInfoPromise()
     setInterval(() => {
       maybeGetGatingInfoPromise().catch(reason => {
         // Catch the error, but ignore or notify.
       })
-    }, 3 * 1000);
+    }, 3 * 1000)
 
     if (cb) {
       initialGatingInfoPromise
         .then(() => cb(null, true))
         .catch(() => cb(new Error("Airship: failed to initialize, will re-try in five (5) minutes.")))
-      return;
+      return
     }
 
-    return initialGatingInfoPromise;
+    return initialGatingInfoPromise
   }
 
   // TODO: fix babel to triggerUploadStats = () => {
   triggerUploadStats() {
     if (!this.gateStatsBatch.length) {
-      return;
+      return
     }
 
     var getUploadStatsPromise = () => {
@@ -116,16 +116,16 @@ export default class Airship {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           console.log('Airship: uploaded stats ', payload)
-          resolve();
+          resolve()
         }, 500)
       })
     }
 
-    return getFakeUploadStatsPromise();
+    return getFakeUploadStatsPromise()
   }
 
   _uploadStatsAsync(gateStats) {
-    this.gateStatsBatch.push(gateStats);
+    this.gateStatsBatch.push(gateStats)
     if (this.gateStatsUploadBatchInterval === 0) {
       setImmediate(this.triggerUploadStats)
       return
@@ -135,35 +135,35 @@ export default class Airship {
       setImmediate(this.triggerUploadStats)
       // recreate the setInterval Timeout
       clearInterval(this.gateStatsUploadTimeout)
-      this.gateStatsUploadTimeout = setInterval(this.triggerUploadStats, this.gateStatsUploadBatchInterval);
+      this.gateStatsUploadTimeout = setInterval(this.triggerUploadStats, this.gateStatsUploadBatchInterval)
     }
   }
 
   _endpoint(objects, controlShortName) {
     const payload = {
       env_key: this.envKey
-    };
+    }
 
     if (controlShortName) {
-      payload.control_short_name = controlShortName;
+      payload.control_short_name = controlShortName
     }
 
     if (Array.isArray(objects)) {
-      payload.objects = objects.map(this.transformer);
+      payload.objects = objects.map(this.transformer)
     } else {
-      payload.object = this.transformer(objects);
+      payload.object = this.transformer(objects)
     }
 
     const url = controlShortName
       ? "https://api.airshiphq.com/v1/gate"
-      : "https://api.airshiphq.com/v1/identify";
+      : "https://api.airshiphq.com/v1/identify"
 
     return request
       .post(url)
       .type("application/json")
       .set("Api-Key", this.apiKey)
       .timeout(this.timeout)
-      .send(payload);
+      .send(payload)
   }
 
   _processEndpoint(controlShortName, objects, processObjectResponse) {
@@ -172,11 +172,11 @@ export default class Airship {
         return response.body.map((objectResponse, index) => [
           objects[index],
           processObjectResponse(objectResponse)
-        ]);
+        ])
       } else {
-        return processObjectResponse(response.body);
+        return processObjectResponse(response.body)
       }
-    });
+    })
   }
 
   isEnabled(controlShortName, object) {
@@ -211,7 +211,7 @@ export default class Airship {
       controlShortName,
       objects,
       o => o.control.value
-    );
+    )
   }
 
   getVariationAsync(controlShortName, objects) {
@@ -219,10 +219,10 @@ export default class Airship {
       controlShortName,
       objects,
       o => o.control.variation
-    );
+    )
   }
 
   uploadObjects(objects) {
-    return this._endpoint(objects);
+    return this._endpoint(objects)
   }
 }
