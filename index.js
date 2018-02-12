@@ -110,7 +110,7 @@ class Airship {
     this.transformer = options.transformer || (x => x)
 
     // This is passed a reason.
-    this.gatingInfoErrorCb = options.gatingInfoErrorCb || (() => console.error('Airship: failed to retrieve gating info.'))
+    this.gatingInfoErrorCb = options.gatingInfoErrorCb || (() => { console.error('Airship: failed to retrieve gating info.') })
     this.gatingInfo = null
     // Used to check whether we are already trying to get gatingInfo.
     this.gatingInfoPromise = null
@@ -221,7 +221,7 @@ class Airship {
         .send({
           envKey: this.envKey,
           objects: payload,
-        })
+        }).then(() => {}).catch(() => {})
     }
 
     // TODO: remove this fake one. The entire function body can be replaced with the new one after
