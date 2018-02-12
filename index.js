@@ -13,7 +13,7 @@ class Airship {
     // Used to check whether we are already trying to get gatingInfo.
     this.gatingInfoPromise = null
 
-    var hardMaxGateStatsBatchSize = 500
+    let hardMaxGateStatsBatchSize = 500
     this.maxGateStatsBatchSize = options.maxGateStatsBatchSize != null // Allow 0 for no batching
       ? Math.min(Math.max(options.maxGateStatsBatchSize, 0), hardMaxGateStatsBatchSize) : hardMaxGateStatsBatchSize
     this.gateStatsUploadBatchInterval = options.gateStatsUploadBatchInterval != null // Allow 0 for BatchInterval -> immediate
@@ -36,7 +36,7 @@ class Airship {
       this.gateStatsUploadTimeout = setInterval(this.triggerUploadStats, this.gateStatsUploadBatchInterval)
     }
 
-    var getGatingInfoPromise = () => {
+    let getGatingInfoPromise = () => {
       // TODO: get the url for this request
       return request.get('gatingInfo-endpoint')
         .set('Api-Key', this.apiKey)
@@ -44,10 +44,10 @@ class Airship {
     }
 
     // TODO: remove this fake one
-    var getFakeGatingInfoPromise = () => {
+    let getFakeGatingInfoPromise = () => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          var gatingInfo = {
+          let gatingInfo = {
             timestamp: Date.now()
           }
           console.log('Airship: retrieved gatingInfo', gatingInfo)
@@ -56,7 +56,7 @@ class Airship {
       })
     }
 
-    var maybeGetGatingInfoPromise = () => {
+    let maybeGetGatingInfoPromise = () => {
       if (this.gatingInfoPromise) {
         return
       }
@@ -72,7 +72,7 @@ class Airship {
       return this.gatingInfoPromise
     }
 
-    var initialGatingInfoPromise = maybeGetGatingInfoPromise()
+    let initialGatingInfoPromise = maybeGetGatingInfoPromise()
     setInterval(() => {
       maybeGetGatingInfoPromise().catch(reason => {
         // Catch the error, but ignore or notify.
@@ -95,8 +95,8 @@ class Airship {
       return
     }
 
-    var getUploadStatsPromise = () => {
-      var payload = this.gateStatsBatch
+    let getUploadStatsPromise = () => {
+      let payload = this.gateStatsBatch
       this.gateStatsBatch = []
 
       // TODO: error handling on triggerUploadStats - do we try again?
@@ -110,8 +110,8 @@ class Airship {
     }
 
     // TODO: remove this fake one. The entire function body can be replaced with the new one after
-    var getFakeUploadStatsPromise = () => {
-      var payload = this.gateStatsBatch
+    let getFakeUploadStatsPromise = () => {
+      let payload = this.gateStatsBatch
       this.gateStatsBatch = []
       return new Promise((resolve, reject) => {
         setTimeout(() => {
