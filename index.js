@@ -361,6 +361,41 @@ class Airship {
       }
     }
 
+    snakeCaseFound = false
+    camelCaseFound = false
+
+    if (object.display_name !== undefined || object.is_group !== undefined) {
+      snakeCaseFound = true
+    }
+
+    if (object.displayName !== undefined || object.isGroup !== undefined) {
+      camelCaseFound = true
+    }
+
+    if (object.group !== undefined) {
+      let group = object.group
+
+      if (group.display_name !== undefined || group.is_group !== undefined) {
+        snakeCaseFound = true
+      }
+
+      if (group.displayName !== undefined || group.isGroup !== undefined) {
+        camelCaseFound = true
+      }
+    }
+
+    if (snakeCaseFound && camelCaseFound) {
+      return 'Please use either snake_case or camelCase'
+    }
+
+    return null
+  }
+
+  _validateNesting = (object) => {
+    if ((object.isGroup === true || object.is_group === true) && object.group !== undefined) {
+      return 'A group cannot be nested inside another group'
+    }
+
     return null
   }
 
@@ -378,7 +413,7 @@ class Airship {
 
     object = this._cloneObject(object)
 
-    let error = this._validateCasing(object)
+    let error = this._validateCasing(object) || this._validateNesting(object)
 
     if (error) {
       console.error(error)
@@ -414,7 +449,7 @@ class Airship {
 
     object = this._cloneObject(object)
 
-    let error = this._validateCasing(object)
+    let error = this._validateCasing(object) || this._validateNesting(object)
 
     if (error) {
       console.error(error)
@@ -450,7 +485,7 @@ class Airship {
 
     object = this._cloneObject(object)
 
-    let error = this._validateCasing(object)
+    let error = this._validateCasing(object) || this._validateNesting(object)
 
     if (error) {
       console.error(error)
