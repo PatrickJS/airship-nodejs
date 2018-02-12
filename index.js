@@ -16,12 +16,20 @@ const SCHEMA = {
     "is_group": {
       "type": "boolean",
     },
+    "isGroup": {
+      "type": "boolean",
+    },
     "id": {
       "type": "string",
       "maxLength": 250,
       "minLength": 1,
     },
     "display_name": {
+      "type": "string",
+      "maxLength": 250,
+      "minLength": 1,
+    },
+    "displayName": {
       "type": "string",
       "maxLength": 250,
       "minLength": 1,
@@ -59,12 +67,21 @@ const SCHEMA = {
           "type": "boolean",
           "enum": [true],
         },
+        "isGroup": {
+          "type": "boolean",
+          "enum": [true],
+        },
         "id": {
           "type": "string",
           "maxLength": 250,
           "minLength": 1,
         },
         "display_name": {
+          "type": "string",
+          "maxLength": 250,
+          "minLength": 1,
+        },
+        "displayName": {
           "type": "string",
           "maxLength": 250,
           "minLength": 1,
@@ -91,11 +108,17 @@ const SCHEMA = {
           "additionalProperties": false,
         },
       },
-      "required": ["id", "display_name"],
+      "oneOf": [
+        {"required": ["id", "display_name"]},
+        {"required": ["id", "displayName"]},
+      ],
       "additionalProperties": false,
     },
   },
-  "required": ["type", "id", "display_name"],
+  "oneOf": [
+    {"required": ["type", "id", "display_name"]},
+    {"required": ["type", "id", "displayName"]},
+  ],
   "additionalProperties": false,
 }
 
