@@ -1,6 +1,6 @@
 import request from 'superagent'
 import Ajv from 'ajv'
-import version from './package.json'
+import { version } from './package.json'
 
 const SERVER_URL = 'https://api.airshiphq.com'
 const GATE_ENDPOINT = `${SERVER_URL}/v1/gate`
@@ -16,18 +16,10 @@ const SCHEMA = {
       "pattern": "^([A-Z][a-zA-Z]*)+$",
       "maxLength": 50,
     },
-    "is_group": {
-      "type": "boolean",
-    },
     "isGroup": {
       "type": "boolean",
     },
     "id": {
-      "type": "string",
-      "maxLength": 250,
-      "minLength": 1,
-    },
-    "display_name": {
       "type": "string",
       "maxLength": 250,
       "minLength": 1,
@@ -66,20 +58,11 @@ const SCHEMA = {
           "pattern": "^([A-Z][a-zA-Z]*)+$",
           "maxLength": 50,
         },
-        "is_group": {
-          "type": "boolean",
-          "enum": [true],
-        },
         "isGroup": {
           "type": "boolean",
           "enum": [true],
         },
         "id": {
-          "type": "string",
-          "maxLength": 250,
-          "minLength": 1,
-        },
-        "display_name": {
           "type": "string",
           "maxLength": 250,
           "minLength": 1,
@@ -111,17 +94,11 @@ const SCHEMA = {
           "additionalProperties": false,
         },
       },
-      "oneOf": [
-        {"required": ["id", "display_name"]},
-        {"required": ["id", "displayName"]},
-      ],
+      "required": ["id", "displayName"],
       "additionalProperties": false,
     },
   },
-  "oneOf": [
-    {"required": ["type", "id", "display_name"]},
-    {"required": ["type", "id", "displayName"]},
-  ],
+  "required": ["type", "id", "displayName"],
   "additionalProperties": false,
 }
 
@@ -317,7 +294,7 @@ class Airship {
         isEnabled: false,
         variation: null,
         isEligible: false,
-        _shouldSendStats: false,
+        _shouldSendStats: true,
       }
     }
   }
@@ -340,29 +317,8 @@ class Airship {
     return clone
   }
 
-  _validateCasing = (object) => {
-    snakeCaseFound = false
-    camelCaseFound = false
-
-    snakeCaseFound = snakeCaseFound || (object.display_name !== undefined || object.is_group !== undefined)
-    camelCaseFound = camelCaseFound || (object.displayName !== undefined || object.isGroup !== undefined)
-
-    if (object.group !== undefined) {
-      let group = object.group
-
-      snakeCaseFound = snakeCaseFound || (group.display_name !== undefined || group.is_group !== undefined)
-      camelCaseFound = camelCaseFound || (group.displayName !== undefined || group.isGroup !== undefined)
-    }
-
-    if (snakeCaseFound && camelCaseFound) {
-      return 'Please use either snake_case or camelCase, not both'
-    }
-
-    return null
-  }
-
   _validateNesting = (object) => {
-    if ((object.isGroup === true || object.is_group === true) && object.group !== undefined) {
+    if (object.isGroup === true && object.group !== undefined) {
       return 'A group cannot be nested inside another group'
     }
 
@@ -383,7 +339,7 @@ class Airship {
 
     object = this._cloneObject(object)
 
-    let error = this._validateCasing(object) || this._validateNesting(object)
+    let error = this._validateNesting(object)
 
     if (error) {
       console.error(error)
@@ -399,7 +355,18 @@ class Airship {
     if (_shouldSendStats) {
       let sdkGateTimestamp = gateTimestamp
       let sdkGateLatency = `${end[1] / 1000.0}us`
-      let sdkVersion = `${PLATFORM}${VERSION}`
+      let sdkVersion = `${PLATFORM}:${VERSION}`
+
+      let stats = {}
+      stats.sdkGateTimestamp = sdkGateTimestamp
+      stats.sdkGateLatency = sdkGateLatency
+      stats.sdkVersion = sdkVersion
+
+      console.log(stats)
+
+      object.stats = stats
+
+      //this._uploadStatsAsync(object)
     }
 
     return isEnabled
@@ -419,7 +386,7 @@ class Airship {
 
     object = this._cloneObject(object)
 
-    let error = this._validateCasing(object) || this._validateNesting(object)
+    let error = this._validateNesting(object)
 
     if (error) {
       console.error(error)
@@ -435,7 +402,18 @@ class Airship {
     if (_shouldSendStats) {
       let sdkGateTimestamp = gateTimestamp
       let sdkGateLatency = `${end[1] / 1000.0}us`
-      let sdkVersion = `${PLATFORM}${VERSION}`
+      let sdkVersion = `${PLATFORM}:${VERSION}`
+
+      let stats = {}
+      stats.sdkGateTimestamp = sdkGateTimestamp
+      stats.sdkGateLatency = sdkGateLatency
+      stats.sdkVersion = sdkVersion
+
+      console.log(stats)
+
+      object.stats = stats
+
+      //this._uploadStatsAsync(object)
     }
 
     return variation
@@ -455,7 +433,7 @@ class Airship {
 
     object = this._cloneObject(object)
 
-    let error = this._validateCasing(object) || this._validateNesting(object)
+    let error = this._validateNesting(object)
 
     if (error) {
       console.error(error)
@@ -471,24 +449,18 @@ class Airship {
     if (_shouldSendStats) {
       let sdkGateTimestamp = gateTimestamp
       let sdkGateLatency = `${end[1] / 1000.0}us`
-      let sdkVersion = `${PLATFORM}${VERSION}`
+      let sdkVersion = `${PLATFORM}:${VERSION}`
 
-      let usesSnakeCase = object.display_name !== undefined
+      let stats = {}
+      stats.sdkGateTimestamp = sdkGateTimestamp
+      stats.sdkGateLatency = sdkGateLatency
+      stats.sdkVersion = sdkVersion
 
-      stats = {}
-      if (usesSnakeCase) {
-        stats.sdk_gate_timestamp = sdkGateTimestamp
-        stats.sdk_gate_latency = sdkGateLatency
-        stats.sdk_version = sdkVersion
-      } else {
-        stats.sdkGateTimestamp = sdkGateTimestamp
-        stats.sdkGateLatency = sdkGateLatency
-        stats.sdkVersion = sdkVersion
-      }
+      console.log(stats)
 
       object.stats = stats
 
-      this._uploadStatsAsync(object)
+      //this._uploadStatsAsync(object)
     }
 
     return isEligible
