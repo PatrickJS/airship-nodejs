@@ -324,6 +324,13 @@ class Airship {
       return false
     }
 
+    let valid = this.validate(object)
+
+    if (!valid) {
+      console.error(this.validate.errors)
+      return false
+    }
+
     let gateTimestamp = (new Date()).toISOString()
   }
 
@@ -332,11 +339,25 @@ class Airship {
       return null
     }
 
+    let valid = this.validate(object)
+
+    if (!valid) {
+      console.error(this.validate.errors)
+      return null
+    }
+
     let gateTimestamp = (new Date()).toISOString()
   }
 
   isEligible = (controlShortName, object) => {
     if (this.gatingInfoMap === null) {
+      return false
+    }
+
+    let valid = this.validate(object)
+
+    if (!valid) {
+      console.error(this.validate.errors)
       return false
     }
 
