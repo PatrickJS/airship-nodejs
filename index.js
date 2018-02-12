@@ -116,6 +116,7 @@ class Airship {
 
       // TODO: get the url for this request
       return request.post('upload-stats-endpoint')
+        .type('application/json')
         .set('api-key', this.apiKey)
         .timeout(this.timeout)
         .send(payload)
@@ -188,46 +189,6 @@ class Airship {
     }
   }
 
-  _endpoint = (objects, controlShortName) => {
-    const payload = {
-      env_key: this.envKey
-    }
-
-    if (controlShortName) {
-      payload.control_short_name = controlShortName
-    }
-
-    if (Array.isArray(objects)) {
-      payload.objects = objects.map(this.transformer)
-    } else {
-      payload.object = this.transformer(objects)
-    }
-
-    const url = controlShortName
-      ? 'https://api.airshiphq.com/v1/gate'
-      : 'https://api.airshiphq.com/v1/identify'
-
-    return request
-      .post(url)
-      .type('application/json')
-      .set('api-key', this.apiKey)
-      .timeout(this.timeout)
-      .send(payload)
-  }
-
-  _processEndpoint = (controlShortName, objects, processObjectResponse) => {
-    return this._endpoint(objects, controlShortName).then(response => {
-      if (Array.isArray(response.body)) {
-        return response.body.map((objectResponse, index) => [
-          objects[index],
-          processObjectResponse(objectResponse)
-        ])
-      } else {
-        return processObjectResponse(response.body)
-      }
-    })
-  }
-
   isEnabled = (controlShortName, object) => {
     // TODO: consider triggering another gatingInfo request if gatingInfo are not present, but we need to be
     // careful with this.
@@ -253,26 +214,6 @@ class Airship {
     // TODO: implement the line below
     const gateStats = Date.now() // TODO: remember to serialize in case objects change
     this._uploadStatsAsync(gateStats)
-  }
-
-  isEnabledAsync = (controlShortName, objects) => {
-    return this._processEndpoint(
-      controlShortName,
-      objects,
-      o => o.control.value
-    )
-  }
-
-  getVariationAsync = (controlShortName, objects) => {
-    return this._processEndpoint(
-      controlShortName,
-      objects,
-      o => o.control.variation
-    )
-  }
-
-  uploadObjects = (objects) => {
-    return this._endpoint(objects)
   }
 }
 
