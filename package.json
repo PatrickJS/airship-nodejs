@@ -13,6 +13,7 @@
     "@babel/core": "^7.0.0-beta.39",
     "@babel/node": "^7.0.0-beta.39",
     "@babel/preset-env": "^7.0.0-beta.39",
+    "@babel/preset-stage-0": "^7.0.0-beta.39",
     "nodemon": "^1.14.12"
   },
   "dependencies": {

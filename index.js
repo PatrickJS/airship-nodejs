@@ -24,14 +24,13 @@ class Airship {
     // More than one upload stats requests can simultaneously be in flight (unlike rules)
     this.gateStatsUploadTimeout = null
     this.gateStatsBatch = []
-    this.triggerUploadStats = this.triggerUploadStats.bind(this)
   }
 
   // If this is passed a callback as an argument, the arguments null, true will be passed on success,
   // or an Error will be passed on failure.
   // If this is not passed a callback as an argument, this will return a Promise that resolves when
   // initialization is complete.
-  init(cb) {
+  init = (cb) => {
     if (this.gateStatsUploadBatchInterval > 0) {
       this.gateStatsUploadTimeout = setInterval(this.triggerUploadStats, this.gateStatsUploadBatchInterval)
     }
@@ -90,7 +89,7 @@ class Airship {
   }
 
   // TODO: fix babel to triggerUploadStats = () => {
-  triggerUploadStats() {
+  triggerUploadStats = () => {
     if (!this.gateStatsBatch.length) {
       return
     }
@@ -124,7 +123,7 @@ class Airship {
     return getFakeUploadStatsPromise()
   }
 
-  _uploadStatsAsync(gateStats) {
+  _uploadStatsAsync = (gateStats) => {
     this.gateStatsBatch.push(gateStats)
     if (this.gateStatsUploadBatchInterval === 0) {
       setImmediate(this.triggerUploadStats)
@@ -139,7 +138,7 @@ class Airship {
     }
   }
 
-  _endpoint(objects, controlShortName) {
+  _endpoint = (objects, controlShortName) => {
     const payload = {
       env_key: this.envKey
     }
@@ -166,7 +165,7 @@ class Airship {
       .send(payload)
   }
 
-  _processEndpoint(controlShortName, objects, processObjectResponse) {
+  _processEndpoint = (controlShortName, objects, processObjectResponse) => {
     return this._endpoint(objects, controlShortName).then(response => {
       if (Array.isArray(response.body)) {
         return response.body.map((objectResponse, index) => [
@@ -179,7 +178,7 @@ class Airship {
     })
   }
 
-  isEnabled(controlShortName, object) {
+  isEnabled = (controlShortName, object) => {
     // TODO: consider triggering another gatingInfo request if gatingInfo are not present, but we need to be
     // careful with this.
     if (this.gatingInfo == null) {
@@ -194,7 +193,7 @@ class Airship {
     this._uploadStatsAsync(gateStats)
   }
 
-  getVariation(controlShortName, objects) {
+  getVariation = (controlShortName, objects) => {
     // TODO: consider triggering another gatingInfo request if gatingInfo are not present, but we need to be
     // careful with this.
     if (this.gatingInfo == null) {
@@ -206,7 +205,7 @@ class Airship {
     this._uploadStatsAsync(gateStats)
   }
 
-  isEnabledAsync(controlShortName, objects) {
+  isEnabledAsync = (controlShortName, objects) => {
     return this._processEndpoint(
       controlShortName,
       objects,
@@ -214,7 +213,7 @@ class Airship {
     )
   }
 
-  getVariationAsync(controlShortName, objects) {
+  getVariationAsync = (controlShortName, objects) => {
     return this._processEndpoint(
       controlShortName,
       objects,
@@ -222,7 +221,7 @@ class Airship {
     )
   }
 
-  uploadObjects(objects) {
+  uploadObjects = (objects) => {
     return this._endpoint(objects)
   }
 }
