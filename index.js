@@ -1,5 +1,9 @@
 import request from 'superagent'
 
+const SERVER_URL = 'https://api.airshiphq.com'
+const GATE_ENDPOINT = `${SERVER_URL}/v1/gate`
+const GATING_INFO_ENDPOINT = `${SERVER_URL}/v1/gating-info`
+
 class Airship {
   constructor(options, cb) {
     this.apiKey = options.apiKey
@@ -12,6 +16,7 @@ class Airship {
     this.gatingInfo = null
     // Used to check whether we are already trying to get gatingInfo.
     this.gatingInfoPromise = null
+    this.gatingInfoMap = null
 
     let hardMaxGateStatsBatchSize = 500
     this.maxGateStatsBatchSize = options.maxGateStatsBatchSize !== undefined // Allow 0 for no batching
@@ -36,9 +41,8 @@ class Airship {
     }
 
     let getGatingInfoPromise = () => {
-      // TODO: get the url for this request
-      return request.get('gatingInfo-endpoint')
-        .set('Api-Key', this.apiKey)
+      return request.get(`${GATING_INFO_ENDPOINT}/${this.envKey}`)
+        .set('api-key', this.apiKey)
         .timeout(this.timeout)
     }
 
@@ -60,13 +64,22 @@ class Airship {
         return
       }
 
-      this.gatingInfoPromise = getFakeGatingInfoPromise().then(gatingInfo => {
-        this.gatingInfo = gatingInfo
-        this.gatingInfoPromise = null // this code should be in a .finally, but that may not be widely supported
-      }).catch(reason => {
-        this.gatingInfoPromise = null // this code should be in a .finally, but that may not be widely supported
-        this.gatingInfoErrorCb(reason)
-        throw reason // TODO: important, need to catch inside the setInterval
+      this.gatingInfoPromise = getGatingInfoPromise().then(res => {
+        let gatingInfo = res.body
+
+        if (gatingInfo.serverInfo === 'maintenance') {
+          this.gatingInfoPromise = null
+        } else {
+          let gatingInfoMap = this._getGatingInfoMap(gatingInfo)
+
+          this.gatingInfo = gatingInfo
+          this.gatingInfoMap = gatingInfoMap
+          this.gatingInfoPromise = null
+        }
+      }).catch(err => {
+        this.gatingInfoPromise = null
+        this.gatingInfoErrorCb(err)
+        throw err // TODO: important, need to catch inside the setInterval
       })
       return this.gatingInfoPromise
     }
@@ -76,7 +89,7 @@ class Airship {
       maybeGetGatingInfoPromise().catch(reason => {
         // Catch the error, but ignore or notify.
       })
-    }, 3 * 1000)
+    }, 5 * 60 * 1000)
 
     if (cb) {
       initialGatingInfoPromise
@@ -103,7 +116,7 @@ class Airship {
 
       // TODO: get the url for this request
       return request.post('upload-stats-endpoint')
-        .set('Api-Key', this.apiKey)
+        .set('api-key', this.apiKey)
         .timeout(this.timeout)
         .send(payload)
     }
@@ -121,6 +134,43 @@ class Airship {
     }
 
     return getFakeUploadStatsPromise()
+  }
+
+  _getGatingInfoMap = (gatingInfo) => {
+    let map = {}
+
+    let controls = gatingInfo.controls
+
+    for (let i = 0; i < controls.length; i++) {
+      let control = controls[i]
+      let controlInfo = {}
+
+      controlInfo['is_on'] = control.is_on
+      controlInfo['rule_based_distribution_default_variation'] = control.rule_based_distribution_default_variation
+      controlInfo['rule_sets'] = control.rule_sets
+      controlInfo['distributions'] = control.distributions
+
+      let enablements = control.enablements
+      let enablementInfo = {}
+
+      for (let j = 0; j < enablements.length; j++) {
+        let enablement = enablements[j]
+
+        let clientIdentitiesMap = enablementInfo[enablement.client_object_type_name]
+
+        if (clientIdentitiesMap === undefined) {
+          enablementInfo[enablement.client_object_type_name] = {}
+        }
+
+        enablementInfo[enablement.client_object_type_name][enablement.client_object_identity] = [enablement.is_enabled, enablement.variation]
+      }
+
+      controlInfo['enablements'] = enablementInfo
+
+      map[control.short_name] = controlInfo
+    }
+
+    return map
   }
 
   _uploadStatsAsync = (gateStats) => {
@@ -160,7 +210,7 @@ class Airship {
     return request
       .post(url)
       .type('application/json')
-      .set('Api-Key', this.apiKey)
+      .set('api-key', this.apiKey)
       .timeout(this.timeout)
       .send(payload)
   }
