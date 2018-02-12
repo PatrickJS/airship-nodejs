@@ -14,12 +14,12 @@ class Airship {
     this.gatingInfoPromise = null
 
     let hardMaxGateStatsBatchSize = 500
-    this.maxGateStatsBatchSize = options.maxGateStatsBatchSize != null // Allow 0 for no batching
+    this.maxGateStatsBatchSize = options.maxGateStatsBatchSize !== undefined // Allow 0 for no batching
       ? Math.min(Math.max(options.maxGateStatsBatchSize, 0), hardMaxGateStatsBatchSize) : hardMaxGateStatsBatchSize
-    this.gateStatsUploadBatchInterval = options.gateStatsUploadBatchInterval != null // Allow 0 for BatchInterval -> immediate
+    this.gateStatsUploadBatchInterval = options.gateStatsUploadBatchInterval !== undefined // Allow 0 for BatchInterval -> immediate
       ? Math.max(options.gateStatsUploadBatchInterval, 0) : 5000 // in milliseconds
     // This is the timer from setInterval for uploading stats. This timer is cleared and recreated
-    // when the batch size is reached, ensuring that stats uplead requests are always triggered
+    // when the batch size is reached, ensuring that stats upload requests are always triggered
     // within options.gateStatsUploadBatchInterval seconds of the event.
     // More than one upload stats requests can simultaneously be in flight (unlike rules)
     this.gateStatsUploadTimeout = null
