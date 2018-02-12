@@ -341,26 +341,6 @@ class Airship {
   }
 
   _validateCasing = (object) => {
-    if (object.display_name !== undefined && object.displayName !== undefined) {
-      return 'Please provide either "display_name" or "displayName", but not both'
-    }
-
-    if (object.is_group !== undefined && object.isGroup !== undefined) {
-      return 'Please provide either "is_group" or "isGroup", but not both'
-    }
-
-    if (object.group !== undefined) {
-      let group = object.group
-
-      if (group.display_name !== undefined && group.displayName !== undefined) {
-        return 'Please provide either "display_name" or "displayName", but not both'
-      }
-
-      if (group.is_group !== undefined && group.isGroup !== undefined) {
-        return 'Please provide either "is_group" or "isGroup", but not both'
-      }
-    }
-
     snakeCaseFound = false
     camelCaseFound = false
 
@@ -375,7 +355,7 @@ class Airship {
     }
 
     if (snakeCaseFound && camelCaseFound) {
-      return 'Please use either snake_case or camelCase'
+      return 'Please use either snake_case or camelCase, not both'
     }
 
     return null
