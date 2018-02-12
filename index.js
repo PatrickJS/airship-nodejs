@@ -188,31 +188,32 @@ class Airship {
     }
   }
 
+  _getGatValues = (controlShortName, object) => {
+
+  }
+
   isEnabled = (controlShortName, object) => {
-    // TODO: consider triggering another gatingInfo request if gatingInfo are not present, but we need to be
-    // careful with this.
-    if (this.gatingInfo == null) {
+    if (this.gatingInfoMap === null) {
       return false
     }
 
-    // TODO: remove test logging
-    console.log('current gatingInfo', this.gatingInfo)
-
-    // TODO: implement the line below
-    const gateStats = Date.now() // TODO: remember to serialize in case objects change
-    this._uploadStatsAsync(gateStats)
+    let gateTimestamp = (new Date()).toISOString()
   }
 
-  getVariation = (controlShortName, objects) => {
-    // TODO: consider triggering another gatingInfo request if gatingInfo are not present, but we need to be
-    // careful with this.
-    if (this.gatingInfo == null) {
+  isEligible = (controlShortName, object) => {
+    if (this.gatingInfoMap === null) {
       return null
     }
 
-    // TODO: implement the line below
-    const gateStats = Date.now() // TODO: remember to serialize in case objects change
-    this._uploadStatsAsync(gateStats)
+    let gateTimestamp = (new Date()).toISOString()
+  }
+
+  getVariation = (controlShortName, object) => {
+    if (this.gatingInfoMap === null) {
+      return false
+    }
+
+    let gateTimestamp = (new Date()).toISOString()
   }
 }
 
