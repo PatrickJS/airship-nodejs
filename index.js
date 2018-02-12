@@ -472,6 +472,23 @@ class Airship {
       let sdkGateTimestamp = gateTimestamp
       let sdkGateLatency = `${end[1] / 1000.0}us`
       let sdkVersion = `${PLATFORM}${VERSION}`
+
+      let usesSnakeCase = object.display_name !== undefined
+
+      stats = {}
+      if (usesSnakeCase) {
+        stats.sdk_gate_timestamp = sdkGateTimestamp
+        stats.sdk_gate_latency = sdkGateLatency
+        stats.sdk_version = sdkVersion
+      } else {
+        stats.sdkGateTimestamp = sdkGateTimestamp
+        stats.sdkGateLatency = sdkGateLatency
+        stats.sdkVersion = sdkVersion
+      }
+
+      object.stats = stats
+
+      this._uploadStatsAsync(object)
     }
 
     return isEligible
