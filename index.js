@@ -1,8 +1,103 @@
 import request from 'superagent'
+import Ajv from 'ajv'
 
 const SERVER_URL = 'https://api.airshiphq.com'
 const GATE_ENDPOINT = `${SERVER_URL}/v1/gate`
 const GATING_INFO_ENDPOINT = `${SERVER_URL}/v1/gating-info`
+
+const SCHEMA = {
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^([A-Z][a-zA-Z]*)+$",
+      "maxLength": 50,
+    },
+    "is_group": {
+      "type": "boolean",
+    },
+    "id": {
+      "type": "string",
+      "maxLength": 250,
+      "minLength": 1,
+    },
+    "display_name": {
+      "type": "string",
+      "maxLength": 250,
+      "minLength": 1,
+    },
+    "attributes": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z_]{0,48}[a-zA-Z]$": {
+          "oneOf": [
+            {
+              "type": "string",
+              "maxLength": 3000,
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+          ],
+        },
+      },
+      "maxProperties": 100,
+      "additionalProperties": false,
+    },
+    "group": {
+      "type": ["object", "null"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^([A-Z][a-zA-Z]*)+$",
+          "maxLength": 50,
+        },
+        "is_group": {
+          "type": "boolean",
+          "enum": [true],
+        },
+        "id": {
+          "type": "string",
+          "maxLength": 250,
+          "minLength": 1,
+        },
+        "display_name": {
+          "type": "string",
+          "maxLength": 250,
+          "minLength": 1,
+        },
+        "attributes": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z_]{0,48}[a-zA-Z]$": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "maxLength": 3000,
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "number"
+                },
+              ],
+            },
+          },
+          "maxProperties": 100,
+          "additionalProperties": false,
+        },
+      },
+      "required": ["id", "display_name"],
+      "additionalProperties": false,
+    },
+  },
+  "required": ["type", "id", "display_name"],
+  "additionalProperties": false,
+}
 
 class Airship {
   constructor(options, cb) {
@@ -29,6 +124,8 @@ class Airship {
     // More than one upload stats requests can simultaneously be in flight (unlike rules)
     this.gateStatsUploadTimeout = null
     this.gateStatsBatch = []
+    let ajv = Ajv()
+    this.validate = ajv.compile(SCHEMA)
   }
 
   // If this is passed a callback as an argument, the arguments null, true will be passed on success,
