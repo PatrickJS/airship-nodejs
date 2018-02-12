@@ -319,10 +319,30 @@ class Airship {
     }
   }
 
+  _cloneObject = (object) => {
+    let clone = Object.assign({}, object)
+
+    if (object.attributes !== undefined) {
+      clone.attributes = Object.assign({}, object.attributes)
+    }
+
+    if (object.group !== undefined) {
+      clone.group = Object.assign({}, object.group)
+
+      if (object.group.attributes !== undefined) {
+        clone.group.attributes = Object.assign({}, object.group.attributes)
+      }
+    }
+
+    return clone
+  }
+
   isEnabled = (controlShortName, object) => {
     if (this.gatingInfoMap === null) {
       return false
     }
+
+    object = this._cloneObject(object)
 
     let valid = this.validate(object)
 
@@ -339,6 +359,8 @@ class Airship {
       return null
     }
 
+    object = this._cloneObject(object)
+
     let valid = this.validate(object)
 
     if (!valid) {
@@ -353,6 +375,8 @@ class Airship {
     if (this.gatingInfoMap === null) {
       return false
     }
+
+    object = this._cloneObject(object)
 
     let valid = this.validate(object)
 
