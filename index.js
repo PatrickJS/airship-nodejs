@@ -102,6 +102,19 @@ const SCHEMA = {
   "additionalProperties": false,
 }
 
+const makeid = () => {
+  let text = ''
+  let possible = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+  for (let i = 0; i < 6; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+  }
+
+  return text
+}
+
+const SDK_ID = makeid()
+
 class Airship {
   constructor(options, cb) {
     this.apiKey = options.apiKey
@@ -365,6 +378,7 @@ class Airship {
       stats.sdkGateTimestamp = sdkGateTimestamp
       stats.sdkGateLatency = sdkGateLatency
       stats.sdkVersion = sdkVersion
+      stats.sdkId = SDK_ID
 
       object.stats = stats
 
@@ -411,6 +425,7 @@ class Airship {
       stats.sdkGateTimestamp = sdkGateTimestamp
       stats.sdkGateLatency = sdkGateLatency
       stats.sdkVersion = sdkVersion
+      stats.sdkId = SDK_ID
 
       object.stats = stats
 
@@ -457,6 +472,7 @@ class Airship {
       stats.sdkGateTimestamp = sdkGateTimestamp
       stats.sdkGateLatency = sdkGateLatency
       stats.sdkVersion = sdkVersion
+      stats.sdkId = SDK_ID
 
       object.stats = stats
 
