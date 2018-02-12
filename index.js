@@ -1,6 +1,6 @@
 import request from 'superagent'
 
-export default class Airship {
+class Airship {
   constructor(options, cb) {
     this.apiKey = options.apiKey
     this.envKey = options.envKey
@@ -226,3 +226,5 @@ export default class Airship {
     return this._endpoint(objects)
   }
 }
+
+exports = module.exports = Airship
