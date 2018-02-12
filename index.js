@@ -189,7 +189,14 @@ class Airship {
   }
 
   _getGatValues = (controlShortName, object) => {
-
+    if (this.gatingInfoMap[controlShortName] === undefined) {
+      return {
+        isEnabled: false,
+        variation: null,
+        isEligible: false,
+        _shouldSendStats: false,
+      }
+    }
   }
 
   isEnabled = (controlShortName, object) => {
@@ -200,7 +207,7 @@ class Airship {
     let gateTimestamp = (new Date()).toISOString()
   }
 
-  isEligible = (controlShortName, object) => {
+  getVariation = (controlShortName, object) => {
     if (this.gatingInfoMap === null) {
       return null
     }
@@ -208,7 +215,7 @@ class Airship {
     let gateTimestamp = (new Date()).toISOString()
   }
 
-  getVariation = (controlShortName, object) => {
+  isEligible = (controlShortName, object) => {
     if (this.gatingInfoMap === null) {
       return false
     }
