@@ -403,7 +403,7 @@ class Airship {
 
     if (error) {
       console.error(error)
-      return false
+      return null
     }
 
     let gateTimestamp = (new Date()).toISOString()
