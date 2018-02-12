@@ -337,17 +337,48 @@ class Airship {
     return clone
   }
 
+  _validateCasing = (object) => {
+    if (object.display_name !== undefined && object.displayName !== undefined) {
+      return 'Please provide either "display_name" or "displayName", but not both'
+    }
+
+    if (object.is_group !== undefined && object.isGroup !== undefined) {
+      return 'Please provide either "is_group" or "isGroup", but not both'
+    }
+
+    if (object.group !== undefined) {
+      let group = object.group
+
+      if (group.display_name !== undefined && group.displayName !== undefined) {
+        return 'Please provide either "display_name" or "displayName", but not both'
+      }
+
+      if (group.is_group !== undefined && group.isGroup !== undefined) {
+        return 'Please provide either "is_group" or "isGroup", but not both'
+      }
+    }
+
+    return null
+  }
+
   isEnabled = (controlShortName, object) => {
     if (this.gatingInfoMap === null) {
       return false
     }
 
-    object = this._cloneObject(object)
-
     let valid = this.validate(object)
 
     if (!valid) {
       console.error(this.validate.errors)
+      return false
+    }
+
+    object = this._cloneObject(object)
+
+    let error = this._validateCasing(object)
+
+    if (error) {
+      console.error(error)
       return false
     }
 
@@ -359,13 +390,20 @@ class Airship {
       return null
     }
 
-    object = this._cloneObject(object)
-
     let valid = this.validate(object)
 
     if (!valid) {
       console.error(this.validate.errors)
       return null
+    }
+
+    object = this._cloneObject(object)
+
+    let error = this._validateCasing(object)
+
+    if (error) {
+      console.error(error)
+      return false
     }
 
     let gateTimestamp = (new Date()).toISOString()
@@ -376,12 +414,19 @@ class Airship {
       return false
     }
 
-    object = this._cloneObject(object)
-
     let valid = this.validate(object)
 
     if (!valid) {
       console.error(this.validate.errors)
+      return false
+    }
+
+    object = this._cloneObject(object)
+
+    let error = this._validateCasing(object)
+
+    if (error) {
+      console.error(error)
       return false
     }
 
