@@ -8,6 +8,8 @@ const GATING_INFO_ENDPOINT = `${SERVER_URL}/v1/gating-info`
 const PLATFORM = 'nodejs'
 const VERSION = version
 
+const SDK_VERSION = `${PLATFORM}:${VERSION}`
+
 const SCHEMA = {
   "type": "object",
   "properties": {
@@ -156,6 +158,7 @@ class Airship {
     let getGatingInfoPromise = () => {
       return request.get(`${GATING_INFO_ENDPOINT}/${this.envKey}`)
         .set('api-key', this.apiKey)
+        .set('sdk-version', SDK_VERSION)
         .timeout(this.timeout)
     }
 
@@ -261,9 +264,9 @@ class Airship {
       let control = controls[i]
       let controlInfo = {}
 
-      controlInfo['is_on'] = control.is_on
-      controlInfo['rule_based_distribution_default_variation'] = control.rule_based_distribution_default_variation
-      controlInfo['rule_sets'] = control.rule_sets
+      controlInfo['isOn'] = control.isOn
+      controlInfo['ruleBasedDistributionDefaultVariation'] = control.ruleBasedDistributionDefaultVariation
+      controlInfo['ruleSets'] = control.ruleSets
       controlInfo['distributions'] = control.distributions
 
       let enablements = control.enablements
@@ -272,18 +275,18 @@ class Airship {
       for (let j = 0; j < enablements.length; j++) {
         let enablement = enablements[j]
 
-        let clientIdentitiesMap = enablementInfo[enablement.client_object_type_name]
+        let clientIdentitiesMap = enablementInfo[enablement.clientObjectTypeName]
 
         if (clientIdentitiesMap === undefined) {
-          enablementInfo[enablement.client_object_type_name] = {}
+          enablementInfo[enablement.clientObjectTypeName] = {}
         }
 
-        enablementInfo[enablement.client_object_type_name][enablement.client_object_identity] = [enablement.is_enabled, enablement.variation]
+        enablementInfo[enablement.clientObjectTypeName][enablement.clientObjectIdentity] = [enablement.isEnabled, enablement.variation]
       }
 
       controlInfo['enablements'] = enablementInfo
 
-      map[control.short_name] = controlInfo
+      map[control.shortName] = controlInfo
     }
 
     return map
@@ -306,6 +309,17 @@ class Airship {
 
   _getGatValues = (controlShortName, object) => {
     if (this.gatingInfoMap[controlShortName] === undefined) {
+      return {
+        isEnabled: false,
+        variation: null,
+        isEligible: false,
+        _shouldSendStats: false,
+      }
+    }
+
+    let controlInfo = this.gatingInfoMap[controlShortName]
+
+    if (!controlInfo.isOn) {
       return {
         isEnabled: false,
         variation: null,
@@ -365,13 +379,13 @@ class Airship {
     let gateTimestamp = (new Date()).toISOString()
 
     let start = process.hrtime()
-    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGatValues(object)
+    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGatValues(controlShortName, object)
     let end = process.hrtime(start)
 
     if (_shouldSendStats) {
       let sdkGateTimestamp = gateTimestamp
       let sdkGateLatency = `${end[1] / 1000.0}us`
-      let sdkVersion = `${PLATFORM}:${VERSION}`
+      let sdkVersion = SDK_VERSION
 
       let stats = {}
       stats.sdkGateControlShortName = controlShortName
@@ -418,7 +432,7 @@ class Airship {
     if (_shouldSendStats) {
       let sdkGateTimestamp = gateTimestamp
       let sdkGateLatency = `${end[1] / 1000.0}us`
-      let sdkVersion = `${PLATFORM}:${VERSION}`
+      let sdkVersion = SDK_VERSION
 
       let stats = {}
       stats.sdkGateControlShortName = controlShortName
@@ -465,7 +479,7 @@ class Airship {
     if (_shouldSendStats) {
       let sdkGateTimestamp = gateTimestamp
       let sdkGateLatency = `${end[1] / 1000.0}us`
-      let sdkVersion = `${PLATFORM}:${VERSION}`
+      let sdkVersion = SDK_VERSION
 
       let stats = {}
       stats.sdkGateControlShortName = controlShortName
