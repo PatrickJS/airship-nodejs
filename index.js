@@ -1,9 +1,12 @@
 import request from 'superagent'
 import Ajv from 'ajv'
+import version from './package.json'
 
 const SERVER_URL = 'https://api.airshiphq.com'
 const GATE_ENDPOINT = `${SERVER_URL}/v1/gate`
 const GATING_INFO_ENDPOINT = `${SERVER_URL}/v1/gating-info`
+const PLATFORM = 'nodejs'
+const VERSION = version
 
 const SCHEMA = {
   "type": "object",
@@ -391,7 +394,10 @@ class Airship {
     if (_shouldSendStats) {
       let sdkGateTimestamp = gateTimestamp
       let sdkGateLatency = `${end[1] / 1000.0}us`
+      let sdkVersion = `${PLATFORM}${VERSION}`
     }
+
+    return isEnabled
   }
 
   getVariation = (controlShortName, object) => {
@@ -416,6 +422,18 @@ class Airship {
     }
 
     let gateTimestamp = (new Date()).toISOString()
+
+    let start = process.hrtime()
+    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGatValues(object)
+    let end = process.hrtime(start)
+
+    if (_shouldSendStats) {
+      let sdkGateTimestamp = gateTimestamp
+      let sdkGateLatency = `${end[1] / 1000.0}us`
+      let sdkVersion = `${PLATFORM}${VERSION}`
+    }
+
+    return variation
   }
 
   isEligible = (controlShortName, object) => {
@@ -440,6 +458,18 @@ class Airship {
     }
 
     let gateTimestamp = (new Date()).toISOString()
+
+    let start = process.hrtime()
+    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGatValues(object)
+    let end = process.hrtime(start)
+
+    if (_shouldSendStats) {
+      let sdkGateTimestamp = gateTimestamp
+      let sdkGateLatency = `${end[1] / 1000.0}us`
+      let sdkVersion = `${PLATFORM}${VERSION}`
+    }
+
+    return isEligible
   }
 }
 
