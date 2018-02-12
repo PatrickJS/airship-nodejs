@@ -86,7 +86,7 @@ class Airship {
 
     let initialGatingInfoPromise = maybeGetGatingInfoPromise()
     setInterval(() => {
-      maybeGetGatingInfoPromise().catch(reason => {
+      maybeGetGatingInfoPromise().catch(err => {
         // Catch the error, but ignore or notify.
       })
     }, 5 * 60 * 1000)
@@ -101,9 +101,8 @@ class Airship {
     return initialGatingInfoPromise
   }
 
-  // TODO: fix babel to triggerUploadStats = () => {
   triggerUploadStats = () => {
-    if (!this.gateStatsBatch.length) {
+    if (this.gateStatsBatch.length === 0) {
       return
     }
 
