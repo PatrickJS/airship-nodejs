@@ -3,7 +3,7 @@ import Ajv from 'ajv'
 import { version } from './package.json'
 
 const SERVER_URL = 'https://api.airshiphq.com'
-const GATE_ENDPOINT = `${SERVER_URL}/v1/gate`
+const IDENTIFY_ENDPOINT = `${SERVER_URL}/v1/identify`
 const GATING_INFO_ENDPOINT = `${SERVER_URL}/v1/gating-info`
 const PLATFORM = 'nodejs'
 const VERSION = version
@@ -214,11 +214,14 @@ class Airship {
       // not right now, but we could add .then() referring to `payload` to put it back in the gateStatsBatch
 
       // TODO: get the url for this request
-      return request.post('upload-stats-endpoint')
+      return request.post(IDENTIFY_ENDPOINT)
         .type('application/json')
         .set('api-key', this.apiKey)
         .timeout(this.timeout)
-        .send(payload)
+        .send({
+          envKey: this.envKey,
+          objects: payload,
+        })
     }
 
     // TODO: remove this fake one. The entire function body can be replaced with the new one after
@@ -233,7 +236,7 @@ class Airship {
       })
     }
 
-    return getFakeUploadStatsPromise()
+    return getUploadStatsPromise()
   }
 
   _getGatingInfoMap = (gatingInfo) => {
@@ -358,15 +361,14 @@ class Airship {
       let sdkVersion = `${PLATFORM}:${VERSION}`
 
       let stats = {}
+      stats.sdkGateControlShortName = controlShortName
       stats.sdkGateTimestamp = sdkGateTimestamp
       stats.sdkGateLatency = sdkGateLatency
       stats.sdkVersion = sdkVersion
 
-      console.log(stats)
-
       object.stats = stats
 
-      //this._uploadStatsAsync(object)
+      this._uploadStatsAsync(object)
     }
 
     return isEnabled
@@ -405,15 +407,14 @@ class Airship {
       let sdkVersion = `${PLATFORM}:${VERSION}`
 
       let stats = {}
+      stats.sdkGateControlShortName = controlShortName
       stats.sdkGateTimestamp = sdkGateTimestamp
       stats.sdkGateLatency = sdkGateLatency
       stats.sdkVersion = sdkVersion
 
-      console.log(stats)
-
       object.stats = stats
 
-      //this._uploadStatsAsync(object)
+      this._uploadStatsAsync(object)
     }
 
     return variation
@@ -452,15 +453,14 @@ class Airship {
       let sdkVersion = `${PLATFORM}:${VERSION}`
 
       let stats = {}
+      stats.sdkGateControlShortName = controlShortName
       stats.sdkGateTimestamp = sdkGateTimestamp
       stats.sdkGateLatency = sdkGateLatency
       stats.sdkVersion = sdkVersion
 
-      console.log(stats)
-
       object.stats = stats
 
-      //this._uploadStatsAsync(object)
+      this._uploadStatsAsync(object)
     }
 
     return isEligible
