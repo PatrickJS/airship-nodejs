@@ -364,24 +364,14 @@ class Airship {
     snakeCaseFound = false
     camelCaseFound = false
 
-    if (object.display_name !== undefined || object.is_group !== undefined) {
-      snakeCaseFound = true
-    }
-
-    if (object.displayName !== undefined || object.isGroup !== undefined) {
-      camelCaseFound = true
-    }
+    snakeCaseFound = snakeCaseFound || (object.display_name !== undefined || object.is_group !== undefined)
+    camelCaseFound = camelCaseFound || (object.displayName !== undefined || object.isGroup !== undefined)
 
     if (object.group !== undefined) {
       let group = object.group
 
-      if (group.display_name !== undefined || group.is_group !== undefined) {
-        snakeCaseFound = true
-      }
-
-      if (group.displayName !== undefined || group.isGroup !== undefined) {
-        camelCaseFound = true
-      }
+      snakeCaseFound = snakeCaseFound || (group.display_name !== undefined || group.is_group !== undefined)
+      camelCaseFound = camelCaseFound || (group.displayName !== undefined || group.isGroup !== undefined)
     }
 
     if (snakeCaseFound && camelCaseFound) {
