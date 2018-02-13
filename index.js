@@ -1,6 +1,7 @@
 import request from 'superagent'
 import Ajv from 'ajv'
 import { version } from './package.json'
+import md5 from 'md5'
 
 const SERVER_URL = 'https://api.airshiphq.com'
 const IDENTIFY_ENDPOINT = `${SERVER_URL}/v1/identify`
@@ -13,25 +14,25 @@ const SDK_VERSION = `${PLATFORM}:${VERSION}`
 const CONTROL_TYPE_BOOLEAN = 'boolean'
 const CONTROL_TYPE_MULTIVARIATE = 'multivariate'
 
-OBJECT_ATTRIBUTE_TYPE_STRING = 'STRING'
-OBJECT_ATTRIBUTE_TYPE_INT = 'INT'
-OBJECT_ATTRIBUTE_TYPE_FLOAT = 'FLOAT'
-OBJECT_ATTRIBUTE_TYPE_BOOLEAN = 'BOOLEAN'
-OBJECT_ATTRIBUTE_TYPE_DATE = 'DATE'
-OBJECT_ATTRIBUTE_TYPE_DATETIME = 'DATETIME'
+const OBJECT_ATTRIBUTE_TYPE_STRING = 'STRING'
+const OBJECT_ATTRIBUTE_TYPE_INT = 'INT'
+const OBJECT_ATTRIBUTE_TYPE_FLOAT = 'FLOAT'
+const OBJECT_ATTRIBUTE_TYPE_BOOLEAN = 'BOOLEAN'
+const OBJECT_ATTRIBUTE_TYPE_DATE = 'DATE'
+const OBJECT_ATTRIBUTE_TYPE_DATETIME = 'DATETIME'
 
-RULE_OPERATOR_TYPE_IS = 'IS'
-RULE_OPERATOR_TYPE_IS_NOT = 'IS_NOT'
-RULE_OPERATOR_TYPE_IN = 'IN'
-RULE_OPERATOR_TYPE_NOT_IN = 'NOT_IN'
-RULE_OPERATOR_TYPE_LT = 'LT'
-RULE_OPERATOR_TYPE_LTE = 'LTE'
-RULE_OPERATOR_TYPE_GT = 'GT'
-RULE_OPERATOR_TYPE_GTE = 'GTE'
-RULE_OPERATOR_TYPE_FROM = 'FROM'
-RULE_OPERATOR_TYPE_UNTIL = 'UNTIL'
-RULE_OPERATOR_TYPE_AFTER = 'AFTER'
-RULE_OPERATOR_TYPE_BEFORE = 'BEFORE'
+const RULE_OPERATOR_TYPE_IS = 'IS'
+const RULE_OPERATOR_TYPE_IS_NOT = 'IS_NOT'
+const RULE_OPERATOR_TYPE_IN = 'IN'
+const RULE_OPERATOR_TYPE_NOT_IN = 'NOT_IN'
+const RULE_OPERATOR_TYPE_LT = 'LT'
+const RULE_OPERATOR_TYPE_LTE = 'LTE'
+const RULE_OPERATOR_TYPE_GT = 'GT'
+const RULE_OPERATOR_TYPE_GTE = 'GTE'
+const RULE_OPERATOR_TYPE_FROM = 'FROM'
+const RULE_OPERATOR_TYPE_UNTIL = 'UNTIL'
+const RULE_OPERATOR_TYPE_AFTER = 'AFTER'
+const RULE_OPERATOR_TYPE_BEFORE = 'BEFORE'
 
 const SCHEMA = {
   "type": "object",
@@ -139,6 +140,11 @@ const makeid = () => {
 }
 
 const SDK_ID = makeid()
+
+
+const getHashedValue = (s) => {
+  return parseInt(md5(s), 16) * 1.0 / 340282366920938463463374607431768211455
+}
 
 class Airship {
   constructor(options, cb) {
@@ -287,6 +293,7 @@ class Airship {
       let control = controls[i]
       let controlInfo = {}
 
+      controlInfo.id = control.id
       controlInfo.isOn = control.isOn
       controlInfo.ruleBasedDistributionDefaultVariation = control.ruleBasedDistributionDefaultVariation
       controlInfo.ruleSets = control.ruleSets
@@ -506,7 +513,10 @@ class Airship {
       }
 
       if (satisfiesAllRules) {
-        sampledInsideBasePopulation = true
+        let hashKey = `SAMPLING:control_${controlInfo.id}:env_${ruleSet.envId}:rule_set_${ruleSet.id}:client_object_${object.type}_${object.id}`
+        if (getHashedValue(hashKey) <= ruleSet.samplingPercentage) {
+          sampledInsideBasePopulation = true
+        }
       }
     }
 
