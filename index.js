@@ -562,7 +562,36 @@ class Airship {
       if (percentageBasedDistributions.length !== 0) {
 
       } else {
+        for (let i = 0; i < ruleBasedDistributions.length; i++) {
+          let distribution = ruleBasedDistributions[i]
 
+          let ruleSet = distribution.ruleSet
+          let rules = ruleSet.rules
+
+          if (ruleSet.clientObjectTypeName !== object.type) {
+            continue
+          }
+
+          let satisfiesAllRules = true
+          for (let j = 0; j < rules.length; j++) {
+            let rule = rules[j]
+            satisfiesAllRules = satisfiesAllRules && this._satisfiesRule(rule, object)
+          }
+
+          if (satisfiesAllRules) {
+            return {
+              isEnabled: true,
+              variation: distribution.variation,
+              isEligible: true,
+            }
+          }
+        }
+
+        return {
+          isEnabled: true,
+          variation: controlInfo.ruleBasedDistributionDefaultVariation,
+          isEligible: true,
+        }
       }
     } else {
       return {
