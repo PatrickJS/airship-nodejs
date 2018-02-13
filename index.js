@@ -629,7 +629,7 @@ class Airship {
 
         return {
           isEnabled: true,
-          variation: controlInfo.ruleBasedDistributionDefaultVariation,
+          variation: controlInfo.ruleBasedDistributionDefaultVariation || controlInfo.defaultVariation,
           isEligible: true,
           _ruleBasedDefaultVariation: true,
         }
