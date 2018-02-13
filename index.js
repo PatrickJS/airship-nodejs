@@ -13,6 +13,26 @@ const SDK_VERSION = `${PLATFORM}:${VERSION}`
 const CONTROL_TYPE_BOOLEAN = 'boolean'
 const CONTROL_TYPE_MULTIVARIATE = 'multivariate'
 
+OBJECT_ATTRIBUTE_TYPE_STRING = 'STRING'
+OBJECT_ATTRIBUTE_TYPE_INT = 'INT'
+OBJECT_ATTRIBUTE_TYPE_FLOAT = 'FLOAT'
+OBJECT_ATTRIBUTE_TYPE_BOOLEAN = 'BOOLEAN'
+OBJECT_ATTRIBUTE_TYPE_DATE = 'DATE'
+OBJECT_ATTRIBUTE_TYPE_DATETIME = 'DATETIME'
+
+RULE_OPERATOR_TYPE_IS = 'IS'
+RULE_OPERATOR_TYPE_IS_NOT = 'IS_NOT'
+RULE_OPERATOR_TYPE_IN = 'IN'
+RULE_OPERATOR_TYPE_NOT_IN = 'NOT_IN'
+RULE_OPERATOR_TYPE_LT = 'LT'
+RULE_OPERATOR_TYPE_LTE = 'LTE'
+RULE_OPERATOR_TYPE_GT = 'GT'
+RULE_OPERATOR_TYPE_GTE = 'GTE'
+RULE_OPERATOR_TYPE_FROM = 'FROM'
+RULE_OPERATOR_TYPE_UNTIL = 'UNTIL'
+RULE_OPERATOR_TYPE_AFTER = 'AFTER'
+RULE_OPERATOR_TYPE_BEFORE = 'BEFORE'
+
 const SCHEMA = {
   "type": "object",
   "properties": {
@@ -311,6 +331,114 @@ class Airship {
     }
   }
 
+  _satisfiesRule = (rule, object) => {
+    let attributeType = rule.attributeType
+    let operator = rule.operator
+    if (attributeType === OBJECT_ATTRIBUTE_TYPE_STRING) {
+      if (operator === RULE_OPERATOR_TYPE_IS) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IN) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
+
+      } else {
+        return false
+      }
+    } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_INT) {
+      if (operator === RULE_OPERATOR_TYPE_IS) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IN) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_LT) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_LTE) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_GT) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_GTE) {
+
+      } else {
+        return false
+      }
+    } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_FLOAT) {
+      if (operator === RULE_OPERATOR_TYPE_IS) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IN) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_LT) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_LTE) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_GT) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_GTE) {
+
+      } else {
+        return false
+      }
+    } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_BOOLEAN) {
+      if (operator === RULE_OPERATOR_TYPE_IS) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
+
+      } else {
+        return false
+      }
+    } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_DATE) {
+      if (operator === RULE_OPERATOR_TYPE_IS) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IN) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_FROM) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_UNTIL) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_AFTER) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_BEFORE) {
+
+      } else {
+        return false
+      }
+    } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_DATETIME) {
+      if (operator === RULE_OPERATOR_TYPE_IS) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_IN) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_FROM) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_UNTIL) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_AFTER) {
+
+      } else if (operator === RULE_OPERATOR_TYPE_BEFORE) {
+
+      } else {
+        return false
+      }
+    } else {
+      return false
+    }
+  }
+
   _getGateValuesForObject = (controlInfo, object) => {
     if (controlInfo.enablementsInfo[object.type] !== undefined) {
       if (controlInfo.enablementsInfo[object.type][object.id] !== undefined) {
@@ -326,7 +454,23 @@ class Airship {
 
     let sampledInsideBasePopulation = false
     for (let i = 0; i < controlInfo.ruleSets.length; i++) {
+      if (sampledInsideBasePopulation) {
+        break
+      }
+      let ruleSet = controlInfo.ruleSets[i]
+      let rules = ruleSet.rules
 
+      if (ruleSet.clientObjectTypeName !== object.type) {
+        continue
+      }
+
+      let satisfiesAllRules = true
+      for (let j = 0; j < rules.length; j++) {
+        let rule = rules[j]
+        satisfiesAllRules = satisfiesAllRules && this._satisfiesRule(rule, object)
+      }
+
+      sampledInsideBasePopulation = satisfiesAllRules
     }
 
     if (!sampledInsideBasePopulation) {
