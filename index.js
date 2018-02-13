@@ -14,6 +14,9 @@ const SDK_VERSION = `${PLATFORM}:${VERSION}`
 const CONTROL_TYPE_BOOLEAN = 'boolean'
 const CONTROL_TYPE_MULTIVARIATE = 'multivariate'
 
+const DISTRIBUTION_TYPE_RULE_BASED = 'R'
+const DISTRIBUTION_TYPE_PERCENTAGE_BASED = 'P'
+
 const OBJECT_ATTRIBUTE_TYPE_STRING = 'STRING'
 const OBJECT_ATTRIBUTE_TYPE_INT = 'INT'
 const OBJECT_ATTRIBUTE_TYPE_FLOAT = 'FLOAT'
@@ -299,6 +302,7 @@ class Airship {
       controlInfo.ruleSets = control.ruleSets
       controlInfo.distributions = control.distributions
       controlInfo.type = control.type
+      controlInfo.defaultVariation = control.defaultVariation
 
       let enablements = control.enablements
       let enablementsInfo = {}
@@ -535,7 +539,31 @@ class Airship {
         isEligible: true,
       }
     } else if (controlInfo.type === CONTROL_TYPE_MULTIVARIATE) {
+      if (controlInfo.distributions.length === 0) {
+        return {
+          isEnabled: true,
+          variation: controlInfo.defaultVariation,
+          isEligible: true,
+        }
+      }
 
+      let percentageBasedDistributions = controlInfo.distributions.filter(d => d.type === DISTRIBUTION_TYPE_PERCENTAGE_BASED)
+      let ruleBasedDistributions = controlInfo.distributions.filter(d => d.type === DISTRIBUTION_TYPE_RULE_BASED)
+
+      if (percentageBasedDistributions.length !== 0 && ruleBasedDistributions.length !== 0) {
+        console.error('Rule integrity error: please contact support@airshiphq.com')
+        return {
+          isEnabled: false,
+          variation: null,
+          isEligible: false,
+        }
+      }
+
+      if (percentageBasedDistributions.length !== 0) {
+
+      } else {
+
+      }
     } else {
       return {
         isEnabled: false,
