@@ -205,7 +205,7 @@ class Airship {
       maybeGetGatingInfoPromise().catch(err => {
         // Catch the error, but ignore or notify.
       })
-    }, 5 * 60 * 1000)
+    }, 60 * 1000)
 
     if (cb) {
       initialGatingInfoPromise
