@@ -631,6 +631,7 @@ class Airship {
           isEnabled: true,
           variation: controlInfo.ruleBasedDistributionDefaultVariation,
           isEligible: true,
+          _ruleBasedDefaultVariation: true,
         }
       }
     } else {
@@ -676,7 +677,32 @@ class Airship {
         group.isGroup = true
       }
       let groupResult = this._getGateValuesForObject(controlInfo, group)
-      // Reconcile
+
+      if (result._fromEnablement && !result.isEnabled) {
+        // Do nothing
+      } else if (!result._fromEnablement && groupResult._fromEnablement && !groupResult.isEnabled) {
+        result.isEnabled = groupResult.isEnabled
+        result.variation = groupResult.variation
+        result.isEligible = groupResult.isEligible
+      } else if (result.isEnabled) {
+        if (result._ruleBasedDefaultVariation) {
+          if (groupResult.isEnabled) {
+            result.isEnabled = groupResult.isEnabled
+            result.variation = groupResult.variation
+            result.isEligible = groupResult.isEligible
+          } else {
+            // Do nothing
+          }
+        } else {
+          // Do nothing
+        }
+      } else if (groupResult.isEnabled) {
+        result.isEnabled = groupResult.isEnabled
+        result.variation = groupResult.variation
+        result.isEligible = groupResult.isEligible
+      } else {
+        // Do nothing
+      }
     }
 
     result._shouldSendStats = true
@@ -804,6 +830,7 @@ class Airship {
   }
 
   isEligible = (controlShortName, object) => {
+    console.log('111111111')
     if (this.gatingInfoMap === null) {
       return false
     }
@@ -829,6 +856,8 @@ class Airship {
     let start = process.hrtime()
     let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGateValues(object)
     let end = process.hrtime(start)
+
+    console.log(this._getGateValues(object))
 
     if (_shouldSendStats) {
       let sdkGateTimestamp = gateTimestamp
