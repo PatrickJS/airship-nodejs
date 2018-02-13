@@ -505,7 +505,9 @@ class Airship {
         satisfiesAllRules = satisfiesAllRules && this._satisfiesRule(rule, object)
       }
 
-      sampledInsideBasePopulation = satisfiesAllRules
+      if (satisfiesAllRules) {
+        sampledInsideBasePopulation = true
+      }
     }
 
     if (!sampledInsideBasePopulation) {
