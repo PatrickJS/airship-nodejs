@@ -334,63 +334,80 @@ class Airship {
   _satisfiesRule = (rule, object) => {
     let attributeType = rule.attributeType
     let operator = rule.operator
+    let attributeName = rule.attributeName
+    let value = rule.value
+    let valueList = rule.valueList
+
+    if (object.attributes === undefined || object.attributes[attributeName] === undefined) {
+      return false
+    }
+
+    let attributeVal = object.attributes[attributeName]
+
     if (attributeType === OBJECT_ATTRIBUTE_TYPE_STRING) {
       if (operator === RULE_OPERATOR_TYPE_IS) {
-
+        return attributeVal === value
       } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
-
+        return attributeVal !== value
       } else if (operator === RULE_OPERATOR_TYPE_IN) {
-
+        return valueList.indexOf(attributeVal) >= 0
       } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
-
+        return valueList.indexOf(attributeVal) === -1
       } else {
         return false
       }
     } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_INT) {
+      value = value && parseInt(value)
+      valueList = valueList && valueList.map(v => parseInt(v))
+
       if (operator === RULE_OPERATOR_TYPE_IS) {
-
+        return attributeVal === value
       } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
-
+        return attributeVal !== value
       } else if (operator === RULE_OPERATOR_TYPE_IN) {
-
+        return valueList.indexOf(attributeVal) >= 0
       } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
-
+        return valueList.indexOf(attributeVal) === -1
       } else if (operator === RULE_OPERATOR_TYPE_LT) {
-
+        return attributeVal < value
       } else if (operator === RULE_OPERATOR_TYPE_LTE) {
-
+        return attributeVal <= value
       } else if (operator === RULE_OPERATOR_TYPE_GT) {
-
+        return attributeVal > value
       } else if (operator === RULE_OPERATOR_TYPE_GTE) {
-
+        return attributeVal >= value
       } else {
         return false
       }
     } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_FLOAT) {
+      value = value && parseFloat(value)
+      valueList = valueList && valueList.map(v => parseFloat(v))
+
       if (operator === RULE_OPERATOR_TYPE_IS) {
-
+        return attributeVal === value
       } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
-
+        return attributeVal !== value
       } else if (operator === RULE_OPERATOR_TYPE_IN) {
-
+        return valueList.indexOf(attributeVal) >= 0
       } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
-
+        return valueList.indexOf(attributeVal) === -1
       } else if (operator === RULE_OPERATOR_TYPE_LT) {
-
+        return attributeVal < value
       } else if (operator === RULE_OPERATOR_TYPE_LTE) {
-
+        return attributeVal <= value
       } else if (operator === RULE_OPERATOR_TYPE_GT) {
-
+        return attributeVal > value
       } else if (operator === RULE_OPERATOR_TYPE_GTE) {
-
+        return attributeVal >= value
       } else {
         return false
       }
     } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_BOOLEAN) {
+      value = (value === 'true') ? true : false
       if (operator === RULE_OPERATOR_TYPE_IS) {
-
+        return attributeVal === value
       } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
-
+        return attributeVal !== value
       } else {
         return false
       }
