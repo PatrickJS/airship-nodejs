@@ -340,6 +340,10 @@ class Airship {
     let result = this._getGateValuesForObject(controlInfo, object)
 
     if (group !== null) {
+      if (group.type == undefined) {
+        group.type = `${object.type}Group`
+        group.isGroup = true
+      }
       let groupResult = this._getGateValuesForObject(controlInfo, group)
       // Reconcile
     }
