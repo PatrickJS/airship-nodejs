@@ -412,42 +412,60 @@ class Airship {
         return false
       }
     } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_DATE) {
+      value = value && (new Date(value)).getTime()
+      valueList = valueList && valueList.map(v => (new Date(v)).getTime())
+
+      attributeVal = (new Date(attributeVal)).getTime()
+
+      if (isNaN(attributeVal)) {
+        return false
+      }
+
       if (operator === RULE_OPERATOR_TYPE_IS) {
-
+        return attributeVal === value
       } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
-
+        return attributeVal !== value
       } else if (operator === RULE_OPERATOR_TYPE_IN) {
-
+        return valueList.indexOf(attributeVal) >= 0
       } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
-
+        return valueList.indexOf(attributeVal) === -1
       } else if (operator === RULE_OPERATOR_TYPE_FROM) {
-
+        return attributeVal >= value
       } else if (operator === RULE_OPERATOR_TYPE_UNTIL) {
-
+        return attributeVal <= value
       } else if (operator === RULE_OPERATOR_TYPE_AFTER) {
-
+        return attributeVal > value
       } else if (operator === RULE_OPERATOR_TYPE_BEFORE) {
-
+        return attributeVal < value
       } else {
         return false
       }
     } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_DATETIME) {
+      value = value && (new Date(value)).getTime()
+      valueList = valueList && valueList.map(v => (new Date(v)).getTime())
+
+      attributeVal = (new Date(attributeVal)).getTime()
+
+      if (isNaN(attributeVal)) {
+        return false
+      }
+
       if (operator === RULE_OPERATOR_TYPE_IS) {
-
+        return attributeVal === value
       } else if (operator === RULE_OPERATOR_TYPE_IS_NOT) {
-
+        return attributeVal !== value
       } else if (operator === RULE_OPERATOR_TYPE_IN) {
-
+        return valueList.indexOf(attributeVal) >= 0
       } else if (operator === RULE_OPERATOR_TYPE_NOT_IN) {
-
+        return valueList.indexOf(attributeVal) === -1
       } else if (operator === RULE_OPERATOR_TYPE_FROM) {
-
+        return attributeVal >= value
       } else if (operator === RULE_OPERATOR_TYPE_UNTIL) {
-
+        return attributeVal <= value
       } else if (operator === RULE_OPERATOR_TYPE_AFTER) {
-
+        return attributeVal > value
       } else if (operator === RULE_OPERATOR_TYPE_BEFORE) {
-
+        return attributeVal < value
       } else {
         return false
       }
