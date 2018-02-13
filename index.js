@@ -307,7 +307,11 @@ class Airship {
     }
   }
 
-  _getGatValues = (controlShortName, object) => {
+  _getGateValuesForObject = (controlInfo, object) => {
+
+  }
+
+  _getGateValues = (controlShortName, object) => {
     if (this.gatingInfoMap[controlShortName] === undefined) {
       return {
         isEnabled: false,
@@ -327,6 +331,20 @@ class Airship {
         _shouldSendStats: true,
       }
     }
+
+    let group = null
+    if (object.group !== undefined) {
+      group = object.group
+    }
+
+    let result = this._getGateValuesForObject(controlInfo, object)
+
+    if (group !== null) {
+      let groupResult = this._getGateValuesForObject(controlInfo, group)
+      // Reconcile
+    }
+
+    result._shouldSendStats = true
   }
 
   _cloneObject = (object) => {
@@ -379,7 +397,7 @@ class Airship {
     let gateTimestamp = (new Date()).toISOString()
 
     let start = process.hrtime()
-    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGatValues(controlShortName, object)
+    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGateValues(controlShortName, object)
     let end = process.hrtime(start)
 
     if (_shouldSendStats) {
@@ -426,7 +444,7 @@ class Airship {
     let gateTimestamp = (new Date()).toISOString()
 
     let start = process.hrtime()
-    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGatValues(object)
+    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGateValues(object)
     let end = process.hrtime(start)
 
     if (_shouldSendStats) {
@@ -473,7 +491,7 @@ class Airship {
     let gateTimestamp = (new Date()).toISOString()
 
     let start = process.hrtime()
-    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGatValues(object)
+    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGateValues(object)
     let end = process.hrtime(start)
 
     if (_shouldSendStats) {
