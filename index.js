@@ -201,7 +201,7 @@ class Airship {
           let gatingInfo = {
             timestamp: Date.now()
           }
-          console.log('Airship: retrieved gatingInfo', gatingInfo)
+          console.log('Airship: retrieved gatingInfo ', gatingInfo)
           resolve(gatingInfo)
         }, 500)
       })
@@ -830,7 +830,6 @@ class Airship {
   }
 
   isEligible = (controlShortName, object) => {
-    console.log('111111111')
     if (this.gatingInfoMap === null) {
       return false
     }
@@ -856,8 +855,6 @@ class Airship {
     let start = process.hrtime()
     let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGateValues(object)
     let end = process.hrtime(start)
-
-    console.log(this._getGateValues(object))
 
     if (_shouldSendStats) {
       let sdkGateTimestamp = gateTimestamp
