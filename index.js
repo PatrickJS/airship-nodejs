@@ -10,6 +10,9 @@ const VERSION = version
 
 const SDK_VERSION = `${PLATFORM}:${VERSION}`
 
+const CONTROL_TYPE_BOOLEAN = 'boolean'
+const CONTROL_TYPE_MULTIVARIATE = 'multivariate'
+
 const SCHEMA = {
   "type": "object",
   "properties": {
@@ -264,27 +267,28 @@ class Airship {
       let control = controls[i]
       let controlInfo = {}
 
-      controlInfo['isOn'] = control.isOn
-      controlInfo['ruleBasedDistributionDefaultVariation'] = control.ruleBasedDistributionDefaultVariation
-      controlInfo['ruleSets'] = control.ruleSets
-      controlInfo['distributions'] = control.distributions
+      controlInfo.isOn = control.isOn
+      controlInfo.ruleBasedDistributionDefaultVariation = control.ruleBasedDistributionDefaultVariation
+      controlInfo.ruleSets = control.ruleSets
+      controlInfo.distributions = control.distributions
+      controlInfo.type = control.type
 
       let enablements = control.enablements
-      let enablementInfo = {}
+      let enablementsInfo = {}
 
       for (let j = 0; j < enablements.length; j++) {
         let enablement = enablements[j]
 
-        let clientIdentitiesMap = enablementInfo[enablement.clientObjectTypeName]
+        let clientIdentitiesMap = enablementsInfo[enablement.clientObjectTypeName]
 
         if (clientIdentitiesMap === undefined) {
-          enablementInfo[enablement.clientObjectTypeName] = {}
+          enablementsInfo[enablement.clientObjectTypeName] = {}
         }
 
-        enablementInfo[enablement.clientObjectTypeName][enablement.clientObjectIdentity] = [enablement.isEnabled, enablement.variation]
+        enablementsInfo[enablement.clientObjectTypeName][enablement.clientObjectIdentity] = [enablement.isEnabled, enablement.variation]
       }
 
-      controlInfo['enablements'] = enablementInfo
+      controlInfo.enablementsInfo = enablementsInfo
 
       map[control.shortName] = controlInfo
     }
@@ -308,7 +312,46 @@ class Airship {
   }
 
   _getGateValuesForObject = (controlInfo, object) => {
+    if (controlInfo.enablementsInfo[object.type] !== undefined) {
+      if (controlInfo.enablementsInfo[object.type][object.id] !== undefined) {
+        let [isEnabled, variation] = controlInfo.enablementsInfo[object.type][object.id]
+        return {
+          isEnabled,
+          variation,
+          isEligible: isEnabled,
+          _fromEnablement: true,
+        }
+      }
+    }
 
+    let sampledInsideBasePopulation = false
+    for (let i = 0; i < controlInfo.ruleSets.length; i++) {
+
+    }
+
+    if (!sampledInsideBasePopulation) {
+      return {
+        isEnabled: false,
+        variation: null,
+        isEligible: false,
+      }
+    }
+
+    if (controlInfo.type === CONTROL_TYPE_BOOLEAN) {
+      return {
+        isEnabled: true,
+        variation: null,
+        isEligible: true,
+      }
+    } else if (controlInfo.type === CONTROL_TYPE_MULTIVARIATE) {
+
+    } else {
+      return {
+        isEnabled: false,
+        variation: null,
+        isEligible: false,
+      }
+    }
   }
 
   _getGateValues = (controlShortName, object) => {
@@ -349,6 +392,7 @@ class Airship {
     }
 
     result._shouldSendStats = true
+    return result
   }
 
   _cloneObject = (object) => {
