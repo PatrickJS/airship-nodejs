@@ -517,7 +517,7 @@ class Airship {
       }
 
       if (satisfiesAllRules) {
-        let hashKey = `SAMPLING:control_${controlInfo.id}:env_${ruleSet.envId}:rule_set_${ruleSet.id}:client_object_${object.type}_${object.id}`
+        let hashKey = `SAMPLING:control_${controlInfo.id}:env_${this.gatingInfo.env.id}:rule_set_${ruleSet.id}:client_object_${object.type}_${object.id}`
         if (getHashedValue(hashKey) <= ruleSet.samplingPercentage) {
           sampledInsideBasePopulation = true
         }
@@ -560,7 +560,47 @@ class Airship {
       }
 
       if (percentageBasedDistributions.length !== 0) {
+        let delta = 0.0001
+        let sum_percentages = 0.0
+        let running_percentages = []
+        for (let i = 0; i < percentageBasedDistributions.length; i++) {
+          let distribution = percentageBasedDistributions[i]
+          sum_percentages += distribution.percentage
+          if (running_percentages.length === 0) {
+            running_percentages.push(distribution.percentage)
+          } else {
+            running_percentages.push(running_percentages[running_percentages.length - 1] + distribution.percentage)
+          }
+        }
 
+        if (Math.abs(1.0 - sum_percentages) > delta) {
+          console.error('Rule integrity error: please contact support@airshiphq.com')
+          return {
+            isEnabled: false,
+            variation: null,
+            isEligible: false,
+          }
+        }
+
+        let hashKey = `DISTRIBUTION:control_${controlInfo.id}:env_${this.gatingInfo.env.id}:client_object_${object.type}_${object.id}`
+        let hashedPercentage = getHashedValue(hashKey)
+
+        for (let i = 0; i < running_percentages.length; i++) {
+          let percentage = running_percentages[i]
+          if (hashedPercentage <= percentage) {
+            return {
+              isEnabled: true,
+              variation: percentageBasedDistributions[i].variation,
+              isEligible: true,
+            }
+          }
+        }
+
+        return {
+          isEnabled: true,
+          variation: percentageBasedDistributions[percentageBasedDistributions.length - 1].variation,
+          isEligible: true,
+        }
       } else {
         for (let i = 0; i < ruleBasedDistributions.length; i++) {
           let distribution = ruleBasedDistributions[i]
