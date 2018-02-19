@@ -154,7 +154,6 @@ class Airship {
     this.apiKey = options.apiKey
     this.envKey = options.envKey
     this.timeout = options.timeout || 10000
-    this.transformer = options.transformer || (x => x)
 
     // This is passed a reason.
     this.gatingInfoErrorCb = options.gatingInfoErrorCb || (() => { console.error('Airship: failed to retrieve gating info.') })
@@ -460,14 +459,16 @@ class Airship {
         return false
       }
     } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_DATETIME) {
+      let unixTimestamp = (new Date(attributeVal)).getTime()
+
+      if (isNaN(unixTimestamp)) {
+        return false
+      }
+
       value = value && (new Date(value)).getTime()
       valueList = valueList && valueList.map(v => (new Date(v)).getTime())
 
-      attributeVal = (new Date(attributeVal)).getTime()
-
-      if (isNaN(attributeVal)) {
-        return false
-      }
+      attributeVal = unixTimestamp
 
       if (operator === RULE_OPERATOR_TYPE_IS) {
         return attributeVal === value
