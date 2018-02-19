@@ -154,12 +154,7 @@ var Airship = function Airship(options, cb) {
 
   this.apiKey = options.apiKey;
   this.envKey = options.envKey;
-  this.timeout = options.timeout || 10000;
-
-  this.transformer = options.transformer || function (x) {
-    return x;
-  }; // This is passed a reason.
-
+  this.timeout = options.timeout || 10000; // This is passed a reason.
 
   this.gatingInfoErrorCb = options.gatingInfoErrorCb || function () {
     console.error('Airship: failed to retrieve gating info.');
@@ -486,15 +481,17 @@ var _initialiseProps = function _initialiseProps() {
           return false;
         }
       } else if (attributeType === OBJECT_ATTRIBUTE_TYPE_DATETIME) {
+        var _unixTimestamp = new Date(attributeVal).getTime();
+
+        if (isNaN(_unixTimestamp)) {
+          return false;
+        }
+
         value = value && new Date(value).getTime();
         valueList = valueList && valueList.map(function (v) {
           return new Date(v).getTime();
         });
-        attributeVal = new Date(attributeVal).getTime();
-
-        if (isNaN(attributeVal)) {
-          return false;
-        }
+        attributeVal = _unixTimestamp;
 
         if (operator === RULE_OPERATOR_TYPE_IS) {
           return attributeVal === value;
@@ -731,7 +728,7 @@ var _initialiseProps = function _initialiseProps() {
       var result = _this._getGateValuesForObject(controlInfo, object);
 
       if (group !== null) {
-        if (group.type == undefined) {
+        if (group.type === undefined) {
           group.type = "".concat(object.type, "Group");
           group.isGroup = true;
         }
@@ -881,7 +878,7 @@ var _initialiseProps = function _initialiseProps() {
       var gateTimestamp = new Date().toISOString();
       var start = process.hrtime();
 
-      var _this$_getGateValues2 = _this._getGateValues(object),
+      var _this$_getGateValues2 = _this._getGateValues(controlShortName, object),
           isEnabled = _this$_getGateValues2.isEnabled,
           variation = _this$_getGateValues2.variation,
           isEligible = _this$_getGateValues2.isEligible,
@@ -935,7 +932,7 @@ var _initialiseProps = function _initialiseProps() {
       var gateTimestamp = new Date().toISOString();
       var start = process.hrtime();
 
-      var _this$_getGateValues3 = _this._getGateValues(object),
+      var _this$_getGateValues3 = _this._getGateValues(controlShortName, object),
           isEnabled = _this$_getGateValues3.isEnabled,
           variation = _this$_getGateValues3.variation,
           isEligible = _this$_getGateValues3.isEligible,
