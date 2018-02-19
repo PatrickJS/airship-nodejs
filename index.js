@@ -815,7 +815,7 @@ class Airship {
     let gateTimestamp = (new Date()).toISOString()
 
     let start = process.hrtime()
-    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGateValues(object)
+    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGateValues(controlShortName, object)
     let end = process.hrtime(start)
 
     if (_shouldSendStats) {
@@ -862,7 +862,7 @@ class Airship {
     let gateTimestamp = (new Date()).toISOString()
 
     let start = process.hrtime()
-    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGateValues(object)
+    let { isEnabled, variation, isEligible, _shouldSendStats } = this._getGateValues(controlShortName, object)
     let end = process.hrtime(start)
 
     if (_shouldSendStats) {
