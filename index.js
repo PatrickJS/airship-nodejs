@@ -154,7 +154,6 @@ class Airship {
     this.apiKey = options.apiKey
     this.envKey = options.envKey
     this.timeout = options.timeout || 10000
-    this.transformer = options.transformer || (x => x)
 
     // This is passed a reason.
     this.gatingInfoErrorCb = options.gatingInfoErrorCb || (() => { console.error('Airship: failed to retrieve gating info.') })
