@@ -8,8 +8,8 @@
 ```javascript
 import Airship from "airship-nodejs"
 
-// Create an instance with api_key and env_key
-let airship = new Airship({api_key: <api_key>, env_key: <env_key>})
+// Create an instance with apiKey and envKey
+let airship = new Airship({apiKey: <apiKey>, envKey: <envKey>})
 
 // e.g.,
 // let airship = new Airship({apiKey: "r9b72kqdh1wbzkpkf7gntwfapqoc26bl", envKey: "nxmqp35umrd3djth"})
