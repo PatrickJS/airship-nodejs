@@ -35,7 +35,7 @@ airship.isEligible("bitcoin-pay", object)
 ## Attributes (for complex targeting)
 ```javascript
 // Define your object with an attributes dictionary of key-value pairs.
-// Values must be a string, a number, or a boolean. nil values are not accepted.
+// Values must be a string, a number, or a boolean. null values are not accepted.
 // For date or datetime string value, use iso8601 format.
 let object = {
   type: "User",
