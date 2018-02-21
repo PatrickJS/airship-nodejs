@@ -24,7 +24,7 @@ let object = {
   displayName: "ironman@stark.com" // must also be a string
 }
 
-airship.isEnabled("bitcoin-pay", object) // Does object have the feature "bitcoin-pay"?
+airship.isEnabled("bitcoin-pay", object) // Does the object have the feature "bitcoin-pay"?
 airship.getVariation("bitcoin-pay", object) // Get the variation associated with a multi-variate flag
 airship.isEligible("bitcoin-pay", object)
 // Returns true if the object can potentially receive the feature via sampling
