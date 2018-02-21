@@ -18,7 +18,7 @@ let airship = new Airship({apiKey: <apiKey>, envKey: <envKey>})
 airship.init()
 
 // Define your object
-object = {
+let object = {
   type: "User", // "type" starts with a capital letter "[U]ser", "[H]ome", "[C]ar"
   id: "1234", // "id" must be a string, so if you wish to pass an integer, simply convert via .toString()
   displayName: "ironman@stark.com" // must also be a string
@@ -37,7 +37,7 @@ airship.isEligible("bitcoin-pay", object)
 // Define your object with an attributes dictionary of key-value pairs.
 // Values must be a string, a number, or a boolean. nil values are not accepted.
 // For date or datetime string value, use iso8601 format.
-object = {
+let object = {
   type: "User",
   id: "1234",
   displayName: "ironman@stark.com",
@@ -58,7 +58,7 @@ object = {
 ```javascript
 // An object can be a member of a group.
 // The structure of a group object is just like that of the base object.
-object = {
+let object = {
   type: "User",
   id: "1234",
   displayName: "ironman@stark.com",
@@ -91,7 +91,7 @@ object = {
 
 
 // You can ask questions about the group directly (use the `isGroup` flag):
-object = {
+let object = {
   isGroup: true,
   type: "Club",
   id: "5678",
