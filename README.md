@@ -1,7 +1,7 @@
 # airship-nodejs
 
 ## Installation
-`npm install airship-nodejs`
+`npm install --save airship-nodejs`
 
 
 ## Usage
