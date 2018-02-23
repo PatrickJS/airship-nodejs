@@ -163,6 +163,7 @@ var Airship = function Airship(options, cb) {
   this.gatingInfo = null; // Used to check whether we are already trying to get gatingInfo.
 
   this.gatingInfoPromise = null;
+  this.gatingInfoPollingInterval = 60;
   this.gatingInfoMap = null;
   var hardMaxGateStatsBatchSize = 500;
   this.maxGateStatsBatchSize = options.maxGateStatsBatchSize !== undefined // Allow 0 for no batching
@@ -244,13 +245,13 @@ var _initialiseProps = function _initialiseProps() {
       setInterval(function () {
         maybeGetGatingInfoPromise().catch(function (err) {// Catch the error, but ignore or notify.
         });
-      }, 60 * 1000);
+      }, _this.gatingInfoPollingInterval * 1000);
 
       if (cb) {
         initialGatingInfoPromise.then(function () {
           return cb(null, true);
         }).catch(function () {
-          return cb(new Error('Airship: failed to initialize, will re-try in five (5) minutes.'));
+          return cb(new Error('Airship: failed to initialize, will re-try in one minute.'));
         });
         return;
       }
