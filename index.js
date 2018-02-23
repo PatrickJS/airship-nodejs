@@ -160,6 +160,7 @@ class Airship {
     this.gatingInfo = null
     // Used to check whether we are already trying to get gatingInfo.
     this.gatingInfoPromise = null
+    this.gatingInfoPollingInterval = 60
     this.gatingInfoMap = null
 
     let hardMaxGateStatsBatchSize = 500
@@ -236,12 +237,12 @@ class Airship {
       maybeGetGatingInfoPromise().catch(err => {
         // Catch the error, but ignore or notify.
       })
-    }, 60 * 1000)
+    }, this.gatingInfoPollingInterval * 1000)
 
     if (cb) {
       initialGatingInfoPromise
         .then(() => cb(null, true))
-        .catch(() => cb(new Error('Airship: failed to initialize, will re-try in five (5) minutes.')))
+        .catch(() => cb(new Error('Airship: failed to initialize, will re-try in one minute.')))
       return
     }
 
