@@ -802,15 +802,13 @@ var _initialiseProps = function _initialiseProps() {
     enumerable: true,
     writable: true,
     value: function value(controlShortName, object) {
-      if (_this.gatingInfoMap === null) {
-        return false;
-      }
+      var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
       var valid = _this.validate(object);
 
       if (!valid) {
         console.error(_this.validate.errors);
-        return false;
+        return defaultValue;
       }
 
       object = _this._cloneObject(object);
@@ -819,7 +817,11 @@ var _initialiseProps = function _initialiseProps() {
 
       if (error) {
         console.error(error);
-        return false;
+        return defaultValue;
+      }
+
+      if (_this.gatingInfoMap === null) {
+        return defaultValue;
       }
 
       var gateTimestamp = new Date().toISOString();
@@ -856,15 +858,13 @@ var _initialiseProps = function _initialiseProps() {
     enumerable: true,
     writable: true,
     value: function value(controlShortName, object) {
-      if (_this.gatingInfoMap === null) {
-        return null;
-      }
+      var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
       var valid = _this.validate(object);
 
       if (!valid) {
         console.error(_this.validate.errors);
-        return null;
+        return defaultValue;
       }
 
       object = _this._cloneObject(object);
@@ -873,7 +873,11 @@ var _initialiseProps = function _initialiseProps() {
 
       if (error) {
         console.error(error);
-        return null;
+        return defaultValue;
+      }
+
+      if (_this.gatingInfoMap === null) {
+        return defaultValue;
       }
 
       var gateTimestamp = new Date().toISOString();
@@ -910,15 +914,13 @@ var _initialiseProps = function _initialiseProps() {
     enumerable: true,
     writable: true,
     value: function value(controlShortName, object) {
-      if (_this.gatingInfoMap === null) {
-        return false;
-      }
+      var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
       var valid = _this.validate(object);
 
       if (!valid) {
         console.error(_this.validate.errors);
-        return false;
+        return defaultValue;
       }
 
       object = _this._cloneObject(object);
@@ -927,7 +929,11 @@ var _initialiseProps = function _initialiseProps() {
 
       if (error) {
         console.error(error);
-        return false;
+        return defaultValue;
+      }
+
+      if (_this.gatingInfoMap === null) {
+        return defaultValue;
       }
 
       var gateTimestamp = new Date().toISOString();
