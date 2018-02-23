@@ -745,16 +745,12 @@ class Airship {
     return null
   }
 
-  isEnabled = (controlShortName, object) => {
-    if (this.gatingInfoMap === null) {
-      return false
-    }
-
+  isEnabled = (controlShortName, object, defaultValue=false) => {
     let valid = this.validate(object)
 
     if (!valid) {
       console.error(this.validate.errors)
-      return false
+      return defaultValue
     }
 
     object = this._cloneObject(object)
@@ -763,7 +759,11 @@ class Airship {
 
     if (error) {
       console.error(error)
-      return false
+      return defaultValue
+    }
+
+    if (this.gatingInfoMap === null) {
+      return defaultValue
     }
 
     let gateTimestamp = (new Date()).toISOString()
@@ -792,16 +792,12 @@ class Airship {
     return isEnabled
   }
 
-  getVariation = (controlShortName, object) => {
-    if (this.gatingInfoMap === null) {
-      return null
-    }
-
+  getVariation = (controlShortName, object, defaultValue=null) => {
     let valid = this.validate(object)
 
     if (!valid) {
       console.error(this.validate.errors)
-      return null
+      return defaultValue
     }
 
     object = this._cloneObject(object)
@@ -810,7 +806,11 @@ class Airship {
 
     if (error) {
       console.error(error)
-      return null
+      return defaultValue
+    }
+
+    if (this.gatingInfoMap === null) {
+      return defaultValue
     }
 
     let gateTimestamp = (new Date()).toISOString()
@@ -839,16 +839,12 @@ class Airship {
     return variation
   }
 
-  isEligible = (controlShortName, object) => {
-    if (this.gatingInfoMap === null) {
-      return false
-    }
-
+  isEligible = (controlShortName, object, defaultValue=false) => {
     let valid = this.validate(object)
 
     if (!valid) {
       console.error(this.validate.errors)
-      return false
+      return defaultValue
     }
 
     object = this._cloneObject(object)
@@ -857,7 +853,11 @@ class Airship {
 
     if (error) {
       console.error(error)
-      return false
+      return defaultValue
+    }
+
+    if (this.gatingInfoMap === null) {
+      return defaultValue
     }
 
     let gateTimestamp = (new Date()).toISOString()
